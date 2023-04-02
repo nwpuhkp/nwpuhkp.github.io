@@ -1389,17 +1389,6 @@ body {
 input::placeholder {
   color: var(--font-color);
 }
-#web_bg {
-  position: fixed;
-  z-index: -999;
-  width: 100%;
-  height: 100%;
-  background: https://api.btstu.cn/sjbz/api.php?lx=dongman&format=images;
-  background-attachment: local;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-}
 h1,
 h2,
 h3,
@@ -2388,9 +2377,6 @@ figure.highlight pre .javascript .function {
 }
 #recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap .article-meta-link {
   margin: 0 4px;
-}
-#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap time {
-  display: none;
 }
 #recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap a {
   color: #858585;
@@ -3483,9 +3469,6 @@ h1.page-title + .tag-cloud-list {
 #post-info #post-meta a:hover {
   color: #49b1f5;
   text-decoration: underline;
-}
-#post-info #post-meta time {
-  display: none;
 }
 #nav {
   position: absolute;
