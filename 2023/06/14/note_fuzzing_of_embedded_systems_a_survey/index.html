@@ -1,0 +1,300 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>论文阅读-Fuzzing of Embedded Systems A Survey | The Blog of NWPUHKP</title><meta name="author" content="NWPUHKP"><meta name="copyright" content="NWPUHKP"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="论文阅读-Fuzzing of Embedded Systems: A Survey1. Introduction Fuzzing(即模糊测试)是“一种自动测试方法，它使用随机数据(来自文件、网络协议、API调用等)作为软件输入来生成大量测试用例，以发现可利用漏洞的存在”。 尽管模糊测试是一种自动检测软件漏洞的有效技术，但将这种技术直接应用于不太明显且具有很强硬件依赖性的嵌入式设备具有挑战性。 尽">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读-Fuzzing of Embedded Systems A Survey">
+<meta property="og:url" content="http://nwpuhkp.github.io/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/index.html">
+<meta property="og:site_name" content="The Blog of NWPUHKP">
+<meta property="og:description" content="论文阅读-Fuzzing of Embedded Systems: A Survey1. Introduction Fuzzing(即模糊测试)是“一种自动测试方法，它使用随机数据(来自文件、网络协议、API调用等)作为软件输入来生成大量测试用例，以发现可利用漏洞的存在”。 尽管模糊测试是一种自动检测软件漏洞的有效技术，但将这种技术直接应用于不太明显且具有很强硬件依赖性的嵌入式设备具有挑战性。 尽">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png">
+<meta property="article:published_time" content="2023-06-14T08:54:36.000Z">
+<meta property="article:modified_time" content="2023-06-14T09:01:00.045Z">
+<meta property="article:author" content="NWPUHKP">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="模糊测试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://nwpuhkp.github.io/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: {"limitDay":500,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":80,"languages":{"author":"作者: NWPUHKP","link":"链接: ","source":"来源: The Blog of NWPUHKP","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '论文阅读-Fuzzing of Embedded Systems A Survey',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-06-14 17:01:00'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png')"><nav id="nav"><span id="blog-info"><a href="/" title="The Blog of NWPUHKP"><span class="site-name">The Blog of NWPUHKP</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">论文阅读-Fuzzing of Embedded Systems A Survey</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-06-14T08:54:36.000Z" title="发表于 2023-06-14 16:54:36">2023-06-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-06-14T09:01:00.045Z" title="更新于 2023-06-14 17:01:00">2023-06-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/">模糊测试</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">10.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>31分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="论文阅读-Fuzzing of Embedded Systems A Survey"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="论文阅读-Fuzzing-of-Embedded-Systems-A-Survey"><a href="#论文阅读-Fuzzing-of-Embedded-Systems-A-Survey" class="headerlink" title="论文阅读-Fuzzing of Embedded Systems: A Survey"></a>论文阅读-Fuzzing of Embedded Systems: A Survey</h1><h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><ul>
+<li>Fuzzing(即模糊测试)是“一种自动测试方法，它使用随机数据(来自文件、网络协议、API调用等)作为软件输入来生成大量测试用例，以发现可利用漏洞的存在”。</li>
+<li>尽管模糊测试是一种自动检测软件漏洞的有效技术，但将这种技术直接应用于<strong>不太明显且具有很强硬件依赖性的嵌入式设备</strong>具有挑战性。</li>
+<li>尽管由于这些原因，嵌入式系统模糊器的数量少于传统模糊器，但迄今为止已经开发了几种特定于嵌入式系统的模糊器(即模糊器)，我们将在本文中对其进行分析和讨论。</li>
+</ul>
+<h3 id="1-1-Motivation"><a href="#1-1-Motivation" class="headerlink" title="1.1 Motivation"></a>1.1 Motivation</h3><ul>
+<li>许多嵌入式系统模糊测试工具(例如，<strong>Firm-AFL、Avatar2, 和 IoTFuzzer</strong>) 已被提议用于识别嵌入式设备中的错误。但是，没有安全分析师模糊嵌入 式系统或分析固件的综合指南。</li>
+<li>没有系统评价过嵌入式系统模糊测试 (ESF)「针对嵌入式系统和其固件的模糊测试」</li>
+</ul>
+<h2 id="2-SURVEY-METHOD"><a href="#2-SURVEY-METHOD" class="headerlink" title="2. SURVEY METHOD"></a>2. SURVEY METHOD</h2><h3 id="2-1-研究问题"><a href="#2-1-研究问题" class="headerlink" title="2.1 研究问题"></a>2.1 研究问题</h3><ul>
+<li>本文的目标是回答以下问题:<ul>
+<li>RQ1: 传统fuzzing和ESF的区别是什么?</li>
+<li>RQ2: 嵌入式系统的fuzzing技术有哪些类型，其之间各有什么不同？</li>
+<li>RQ3: 目前的嵌入式fuzzing方法如何解决嵌入式模糊测试的难题的？</li>
+<li>RQ4: 研究的挑战和未来的研究趋势是什么？</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-嵌入式系统模糊测试"><a href="#3-嵌入式系统模糊测试" class="headerlink" title="3. 嵌入式系统模糊测试"></a>3. 嵌入式系统模糊测试</h2><h3 id="3-1-嵌入式系统及其固件"><a href="#3-1-嵌入式系统及其固件" class="headerlink" title="3.1 嵌入式系统及其固件"></a>3.1 嵌入式系统及其固件</h3><h4 id="嵌入式系统"><a href="#嵌入式系统" class="headerlink" title="嵌入式系统"></a>嵌入式系统</h4><p>嵌入式系统是一种基于微处理器的系统，开发用于实现作为大型电气系统一部分的一些专用功能。</p>
+<p>它与物理环境交互并与环境中的其他设备通信。</p>
+<p>该系统通常由处理器、存储 器和外围设备组成。</p>
+<p>用于操作嵌入式系统的软件存储在只读存储器 (ROM)或嵌入式系统的闪存芯片。</p>
+<p>这种存储在ROM或闪存芯片中的软件被称为<strong>固件</strong>，其中包括引导加载程序，一个操作系统(OS)，和一个文件系统。<br><strong>固件控制嵌入式设备的硬件，通常是嵌入式系统的模糊测试目标。</strong><br>通常，黑客会对整个固件进行模糊测试，包括操作系统和应用程序。<br>在单片固件设备的情况下，黑客将模糊测试用例输入到接口中，例如启动参数或外围 I&#x2F;O 通道。</p>
+<h4 id="固件"><a href="#固件" class="headerlink" title="固件"></a>固件</h4><p>固件通常由内核、文件系统和应用程序组成。<br><img src="https://www.z4a.net/images/2023/06/12/1890dbdbeb969e7b9.jpg" alt="1890dbdbeb969e7b9.jpg"><br>引导加载程序为操作系统(即内核)准备执行环境。<br>内核是操作系统的核心，控制着整个系统，应用程序通过内核来使用计算机的硬件。</p>
+<p>大多数嵌入式模糊器的目标是<strong>应用程序</strong>，因为应用程序对 Internet开放，攻击者可以访问，并且由于其多样性和不成熟而容易出现漏洞。</p>
+<p>尽管如此，一些模糊器<strong>使用全系统仿真</strong>可以测试嵌入式系统的内核。</p>
+<p>作为模糊测试目标的两类应用程序是<strong>可从网络访问的应用程序和可通过仿真访问的应用程序</strong>。</p>
+<p>前一类是一些应用程序，而后者是很多，另一种模糊 测试目标的分类取决于嵌入式设备的类型。</p>
+<h3 id="3-2-嵌入式系统的分类"><a href="#3-2-嵌入式系统的分类" class="headerlink" title="3.2 嵌入式系统的分类"></a>3.2 嵌入式系统的分类</h3><p><img src="https://www.z4a.net/images/2023/06/12/2.jpg" alt="2.jpg"><br>根据性能，嵌入式设备分为四类:实时、独立、联网和移动嵌入式设备。并根据微控制器的性能，将它们分为小型、中型和复杂的嵌入式设备。但是，由于我们对嵌入式软件测试感兴趣，所以我们遵循操作系统类型。在软件测试方面，嵌入式设备可以根据其操作系统分为三类。因为模糊测试(即安全测试)取决于操作系统。操作系统既为应用程序提供了执行环境，也为它的复杂性提供了漏洞来源。</p>
+<ul>
+<li>类型一（T1）：具有通用操作系统的嵌入式设备。由于通用操作系统具有大量的功能、兼 容性和开发人员的持续支持，它们也被用于嵌入式设备。然而，由于性能限制，操作系统的最 小形状经常用于嵌入式设备。</li>
+<li>类型二（T2）：具有定制操作系统的嵌入式设备。第二类嵌入式设备具有定制的操作系统，例如实时操作系统 (RTOS)。RTOS 用于处理数据的实时应用程序，因为它没有缓冲延迟。这些操作系统适用于低功耗设备。例如，VxWorks或 QNX是具有代表性的RTOS，广泛应用于嵌入式设备。另一个例子是 uClinux(即微控制器 Linux)，它没有内存管理单元 (MMU).</li>
+<li>类型三（T3）：带有单片软件的嵌入式设备。这种嵌入式设备类具有通过编译充当系统和 应用程序的单片软件。例如，许多小型设备，如智能卡、GPS 接收器或恒温器，都采用这种形 式。这些设备通常没有隐藏物理硬件并提供编程接口的硬件抽象层。</li>
+</ul>
+<h3 id="3-3-传统Fuzzing与ESF的比较"><a href="#3-3-传统Fuzzing与ESF的比较" class="headerlink" title="3.3 传统Fuzzing与ESF的比较"></a>3.3 传统Fuzzing与ESF的比较</h3><p><img src="https://www.z4a.net/images/2023/06/14/32cc7b1b21ae0287c.jpg" alt="32cc7b1b21ae0287c.jpg"></p>
+<h4 id="3-3-1-硬件依赖性强"><a href="#3-3-1-硬件依赖性强" class="headerlink" title="3.3.1 硬件依赖性强"></a>3.3.1 硬件依赖性强</h4><p>嵌入式设备有各种微控制器(即MCU)和操作系统。常⻅的MCU类型有 ARM、MIPS(32&#x2F;64bit)、Alpha、x86-64、IA-64、MSP430、PowerPC(32&#x2F;64bit)、 SPARC-V8、V9等10余种，OS超过5种包括 Linux、VxWorks、QNX、uClinux 和 TinyOS，而桌面系统通常具有 x86-64 CPU 和 Linux 操作系统。桌面模糊器通常在目标系统上工作， 但嵌入式系统模糊器在另一个系统上工作，因为目标系统功率低且资源有限。因此，大多数嵌入式系统模糊器使用仿真或重新托管固件。PC模糊器的目标程序是真实世界的数据集，例如 Binutils, LAVA-M，或CGC datasets，而嵌入式系统模糊器的目标是固件中的可执行程序。</p>
+<p>MCU架构有两种主要类型:精简指令集计算 (RISC)和 复杂指令集计算 (CISC). RISC 的示例 是 ARM、MIPS 和 PowerPC 架构，而 CISC 的示例是 x86-64 架构. RISC 体系结构旨在使用 在一个时钟周期内执行的简单指令。相反，CISC 架构专注于通过在目标硬件上构建丰富的指令 集来使用更少的汇编指令。例如，CISC 的“ADD”指令在 RISC 中分为三个独立的指 令:“LOAD”、“ADD”和“STORE”。由于指令被拆分，RISC 架构具有流水线和更好的硬 件使用的优点。因此，许多嵌入式系统都使用 RISC 体系结构。</p>
+<h4 id="3-3-2-崩溃检测"><a href="#3-3-2-崩溃检测" class="headerlink" title="3.3.2 崩溃检测"></a>3.3.2 崩溃检测</h4><p><img src="https://www.z4a.net/images/2023/06/14/4d32704d42f510035.jpg" alt="4d32704d42f510035.jpg"><br>如算法1所示，监控模糊测试结果(即崩溃检测)是 ESF 的关键步骤。崩溃检测在 ESF 中并不容易，但在PC模糊测试中相对容易。T1、T2 和 T3 的碰撞检测率分别为 70%、40% 和 0%。因此，嵌入式系统的崩溃检测率仅为桌面系统的 37%。这是因为桌面系统在崩溃或故障时配备了各种检测机制(例如，错误消息、安 全警告和系统日志)。当正在执行的程序被致命信号(如分段错误)终止时，Linux 中的模糊器会检测到崩溃。这是因为用任意值覆盖返回地址的内存错误会在访问时产生分段错误或中止。这种检测方法简单有效，因为只有模糊器在没有操作系统干预的情况下捕获信号。然而，由于嵌入式操作系统在大多数情况下不提供故障生成机制，因此模糊器很少能检测到故障或崩溃。更糟糕的是，由于嵌入式设备通常没有输出设备(例如监视器)，因此用户无法注意到崩溃检测。</p>
+<h4 id="3-3-3-Instrumentation"><a href="#3-3-3-Instrumentation" class="headerlink" title="3.3.3 Instrumentation"></a>3.3.3 Instrumentation</h4><p>检测方法有两种类型:</p>
+<ul>
+<li><p>在静态分析期间对源代码执行的源代码检测和对编译的二进制文件执行的二进制检测。</p>
+</li>
+<li><p>Instrumentation 在PC系统中经常使用，以通过源代码检测或二进制检测收集所提供输入的代码覆盖率信息或对感兴趣的变量进行跟踪污点分析。</p>
+</li>
+</ul>
+<p>然而，通常情况下，固件或应用程序的源代码无法从嵌入式设备获得。更糟糕的是，由于异 构嵌入式设备具有其 CPU 架构、操作系统和 I&#x2F;O 设备，因此无法重新编译该程序。另一种解决方案不是使用源代码检测，而是使用动态二进制检测工具，例如Pin或 Valgrind。例如，QSYM在通过利用 Pin 的检测技术测试程序二进制文件时使用覆盖率信息。但是，这仅适用于基于通用操作系统的设备，嵌入式操作系统特定设备或没有操作系统的设备除外。</p>
+<h4 id="3-3-4性能和可扩展性"><a href="#3-3-4性能和可扩展性" class="headerlink" title="3.3.4性能和可扩展性"></a>3.3.4性能和可扩展性</h4><p>嵌入式系统具有低功耗和有限资源导致的计算性能限制。已经为当前的嵌入式系统开发了几种技术来克服性能限制。首先，嵌入式系统有功能升级. 由于供应商降低了生产成本，他们通过在保持硬件不变的情况下更改软件来更改和升级嵌入式系统。这种功能升级通常包括克服计算性能的功能限制。其次，在时间限制内处理数据和事件的 RTOS 或实时处理消除了计算性能限制。 第 三，通过优化的编译器去除数据依赖性可以提高计算性能。数据独立性使并行化成为可能，并有助于提高计算性能。最后，让程序使用寄存器、缓存和 DMA 而不是内存对于计算性能更好。</p>
+<p>通常，模糊测试需要重新执行被测程序 (PUT)为每个测试输入保持干净的状态。通过恢复虚拟机快照，这种技术对于桌面系统来说很容易。然而，这对于需要大量时间来重置设备的嵌入式设备来说是困难的。此外，在桌面系统中可以并行执行模糊测试。然而，并行化在嵌入式设备中通常是不可能的，例如嵌入式操作系统设备或没有操作系统的设备。因此，重复试验是不可能的，或者嵌入式系统需要很⻓时间才能进行模糊测试。处理增加的需求的能力被称为可伸缩性，这就是模糊测试领域的并行执行。桌面系统通常支持并行模糊测试，但由于资源和经济原因，在嵌入式设备中是不可能的。由于在嵌入式系统中 构建用于并行模糊测试的环境需要许多实际设备，因此成本很高。例如，AFL(即流行的桌面模 糊器)通过单系统并行化或多系统并行化支持并行模糊测试，这取决于所需的系统数量。总之，ESF 不能期望最先进的作品具有可扩展性。</p>
+<h3 id="3-4-Fuzzer的传统分类"><a href="#3-4-Fuzzer的传统分类" class="headerlink" title="3.4 Fuzzer的传统分类"></a>3.4 Fuzzer的传统分类</h3><p>传统的模糊测试根据他们在测试期间需要的<strong>关于 PUT 的信息量</strong>分为三类，此信息可以包括<strong>检测、代码覆盖率、总路径数、路径约束或任何引导测试用例生成的信息</strong>。<br><img src="https://www.z4a.net/images/2023/06/14/54e954ad50ba8f63d.jpg" alt="54e954ad50ba8f63d.jpg"></p>
+<h4 id="3-4-1-黑盒fuzzer"><a href="#3-4-1-黑盒fuzzer" class="headerlink" title="3.4.1 黑盒fuzzer"></a>3.4.1 黑盒fuzzer</h4><p>只确定程序的接口，而不是PUT的数据结构或算法等细节，黑盒fuzzer根据<strong>预定义的规则随机变异种子</strong>测试用例，而不识别PUT的内部信息。</p>
+<h4 id="3-4-2-白盒fuzzer"><a href="#3-4-2-白盒fuzzer" class="headerlink" title="3.4.2 白盒fuzzer"></a>3.4.2 白盒fuzzer</h4><p>白盒模糊测试是一种基于 PUT 的内部结构和执行期间生成的信息生成测 试用例的技术利用了程序分析技术，例如动态符号执行 (DSE)，生成合适的测试用例。DSE 最初执行程序，生成路径约束，并解决约束。</p>
+<ul>
+<li>白盒模糊测试的优点是：原则上每一个新的测试用例都会覆盖程序中一个新的执行路径。因此，白盒模糊测试提供了更好的代码覆盖率，并且比黑盒模糊测试方法可以发现更多的软件漏 洞。它还能够暴露位于代码深处的漏洞。</li>
+<li>但是，白盒模糊测试有一个缺点：也就是说，解决约束需要很多时间，或者有时由于路径爆炸等各种问题无法解决约束或大量的资源消耗。此外，它需要大量的信息，例如源代码或信息的前期工作。</li>
+</ul>
+<h4 id="3-4-3-灰盒fuzzer"><a href="#3-4-3-灰盒fuzzer" class="headerlink" title="3.4.3 灰盒fuzzer"></a>3.4.3 灰盒fuzzer</h4><p>灰盒模糊器介于黑盒模糊器和白盒模糊器之间，只需要目标程序的部分信 息(即PUT)。此部分信息通常是通过检测生成的代码覆盖率或通过污点分析生成的污点流信息。例如，最流行的灰盒模糊器 AFL 在运行时收集路径覆盖信息，并有效地利用覆盖图 来改变测试用例(即测试输入)。具体来说，它为测试用例提供权重以找到新路径，并且测试用例发生变异。因此，灰盒模糊器非常有效，因为它不需要初步分析并且只收集部分相关信息。</p>
+<h2 id="4-嵌入式系统Fuzzer的分类"><a href="#4-嵌入式系统Fuzzer的分类" class="headerlink" title="4. 嵌入式系统Fuzzer的分类"></a>4. 嵌入式系统Fuzzer的分类</h2><h3 id="4-1-分类"><a href="#4-1-分类" class="headerlink" title="4.1 分类"></a>4.1 分类</h3><p>当我们测试嵌入式系统时，我们发现<strong>连接类型非常</strong>不同而且很重要。换句话说，由于嵌入式系统难以操作、仿真和分析，我们选择<strong>连通性</strong>作为第一个分类标准。因此，我们分类的第一类是直接模糊测试、基于仿真的模糊测试和固件分析。我们根据第一种类型设置第二个标准。然后我们应用传统分类法(<strong>即对程序信息的依赖</strong>)作为第三个标准。分类的第一个标准是每种方法用来对目标设备进行模糊测试的连接类型。我们确定了三种连接类型:<strong>直接连接和模糊测试、基于仿真的模糊测试和固件分析。</strong></p>
+<h4 id="4-1-1-直接模糊测试"><a href="#4-1-1-直接模糊测试" class="headerlink" title="4.1.1 直接模糊测试"></a>4.1.1 直接模糊测试</h4><p>这种方法直接连接目标设备并在没有干预的情况下测试系统固件。这个类别有两种类型的模糊测试：</p>
+<ol>
+<li>通过网络进行模糊测试可以只测试网络应用程序，这很简单，但是只能进行黑盒fuzz。</li>
+<li>其他通过调试接口的fuzzing，比如UART或 JTAG，可以测试操作系统和应用程序。</li>
+</ol>
+<p>因此，第二种方法更有利。然而，它需要大量的前置工作(即制作调试环境)，而且由于删除了调试接口，并不总是可行的。</p>
+<h4 id="4-1-2-基于仿真的模糊测试"><a href="#4-1-2-基于仿真的模糊测试" class="headerlink" title="4.1.2 基于仿真的模糊测试"></a>4.1.2 基于仿真的模糊测试</h4><p>另一种方法使用通过 UART 或 JTAG 从嵌入式设备提取或从固件更新网站下载的固件进行仿真。这种模拟是一种<strong>系统模式模拟</strong>，它在模拟硬件上的操作系统内部执行一些应用程序。但是，由于对支持的内核和支持的 CPU 的一些限制，无法模拟每个硬件。</p>
+<p>因此，部分仿真将外设 API 请求转发到真实设备。这种方法与没有完全支持的系统模式仿真具有相同的效果，但是需要大量的工作来准备实际的设备和转发机制。<strong>用戶模式仿真</strong>通过使用具有系统模式仿真的共享内存状态(即 RAM 文件)，仅将用戶级程序迁移到主机操作系统。这种迁移只有在 系统模式模拟器和用戶模式模拟器中的内核相同时才有可能。用戶模式仿真器具有高吞吐量的 优点。</p>
+<h4 id="4-1-3-固件分析"><a href="#4-1-3-固件分析" class="headerlink" title="4.1.3 固件分析"></a>4.1.3 固件分析</h4><p>第三种方法是固件分析，当需要<strong>固件执行或仿真的动态分析在某些嵌入式系统中很困难时</strong>，这很有用。例如，Firmalice包含三个主要组件:静态程序分析模块、符号执行和身份验证绕过检查模块。静态程序分析模块开发固件的程序依赖图，并创建从起点到目标点的执行路径切片。符号执行引擎找到到达目标点的执行路径和满足约束的输入。身份验 证绕过检查模块确认输入是否导致身份验证绕过漏洞。另一个例子，KARONTE，还分析多二进制交互(即静态分析)并使用污点信息(即流信息)。这种方法通常需要<strong>全面的程序信息</strong>。因此，只能使用白盒Fuzz。</p>
+<h3 id="4-2-主流的Fuzzer（闭源-x2F-开源）"><a href="#4-2-主流的Fuzzer（闭源-x2F-开源）" class="headerlink" title="4.2 主流的Fuzzer（闭源&#x2F;开源）"></a>4.2 主流的Fuzzer（闭源&#x2F;开源）</h3><p><img src="https://www.z4a.net/images/2023/06/14/635b18df3c597cb3d.jpg" alt="635b18df3c597cb3d.jpg"><br><img src="https://www.z4a.net/images/2023/06/14/7b6beeaddfa4c5a1e.jpg" alt="7b6beeaddfa4c5a1e.jpg"><br>表中T1 是具有通用操作系统的嵌入式设备，T2 是具有定制操作系统的嵌入式设备，T3 是单片软件嵌入式设备。</p>
+<p><strong>大多数嵌入式模糊器都针对 T1 和 T2 设备</strong>，因为 T3 固件很难获得和模拟。T3 固件很难获得，因为它是公司财产或具有定制的固件文件格式。</p>
+<p>最常⻅的固件文件格式是 .bin，但定制的固件文件格式是 .npk(Mikrotik公司)、.chk (Netgear公司)、.fw(Cambrionix公司)等。此外，它很难模拟，因为它具有定制的外围设备，例如 UART，实时时钟 (RTC), 通用输入&#x2F;输出 (GPIO),模数转换器 (ADC),数模转换器 (DAC) ，和内部集成电路 (I2C). </p>
+<p>表中的目标列具有固件、程序和服务器应用程序之一:</p>
+<ol>
+<li>固件指示固件本身 (即，模糊器测试整个固件)。</li>
+<li>程式意味着模糊器可以测试所有程序文件。</li>
+<li>服务器应用程序表示模糊器针对服务器应用程序。</li>
+</ol>
+<h2 id="5-详细的Fuzz步骤"><a href="#5-详细的Fuzz步骤" class="headerlink" title="5. 详细的Fuzz步骤"></a>5. 详细的Fuzz步骤</h2><p>算法1描述了ESF的算法。其中ESF 需要额外的预处理步骤，例如获取固件或识别接口。然后应用<strong>传统的模糊测试步骤</strong>，例如输入生成、发送输入和目标监控。表6介绍了流行的嵌入式系统模糊器的模糊测试步骤。</p>
+<p><img src="https://www.z4a.net/images/2023/06/14/8290029657d0fd267.jpg" alt="8290029657d0fd267.jpg"></p>
+<h3 id="5-1-固件获取"><a href="#5-1-固件获取" class="headerlink" title="5.1 固件获取"></a>5.1 固件获取</h3><p>现有的一些研究方法通过网络爬虫收集了很多固件镜像，所有固件镜像都很难收集，因为它们是公司的财产。有时，可以通过 UART 或 JTAG 提取固件映像，但现在设备供应商倾向于禁用调试端口。另一种方法，转储嵌入式设备的闪存，有时是可行的。然而，它需要对闪存进 行拆焊，因此变得更加困难。这种固件获取 对于基于仿真的模糊测试至关重要，因为后续工作无法继续进行。总之，固件获取是基于仿真的模糊测试中不可或缺的步骤。</p>
+<p>为了克服这个限制，IoTFuzzer<strong>针对物联网设备的网络协议</strong>。在基于网络的模糊测试的情况下，模糊测试目标主要是从网络可⻅的网络应用程序。这种狭隘的观点是基于网络的模糊器的局限性，而通过固件仿真进行模糊测试可以测试任何固件应用程序。此外，调试端口(例如 UART 或 JTAG)可用于将模糊测试系统连接到目标设备。例如， 有的研究将 UART 连接用于模糊器，而Avatar2在用实际设备编排仿真器时使用了调试接口。</p>
+<h3 id="5-2-接口"><a href="#5-2-接口" class="headerlink" title="5.2 接口"></a>5.2 接口</h3><p>嵌入式设备的fuzzing接口有固 件、网络、UART、JTAG。</p>
+<h4 id="5-2-1-固件"><a href="#5-2-1-固件" class="headerlink" title="5.2.1 固件"></a>5.2.1 固件</h4><p>许多嵌入式系统模糊器使用从实际设备中提取的固件或从 Internet 获取作为模糊测试目标。获取固件后，它被用作仿真的输入或进一步分析. 当固件用 作仿真的输入时，它可以在执行环境中动态运行和分析。基于仿真的模糊测试受益于在短时间内测试大量固件而没有准备真实设备或创建实验环境的困难。</p>
+<h4 id="5-2-2-网络"><a href="#5-2-2-网络" class="headerlink" title="5.2.2 网络"></a>5.2.2 网络</h4><p>仿真是正确的选择，但它需要大量的工作，例如固件获取、固件解包和可执 行文件分析。此外，模仿并不总是可行的，尤其是当至少有一个作品无法解决时。另一种解决方案是通过网络对嵌入式设备进行模糊测试，通常称为网络模糊器。网络模糊测试通常是一种黑盒Fuzz，它不分析程序源代码或二进制代码，只捕获网络数据包当模糊器检测到异常时，它会存 储网络数据包以供进一步分析。</p>
+<p>同时，IoTFuzzer 分析了 IoT 应用程序和物理设备之间通信 中使用的协议，并执行了协议引导的模糊测试。IoTFuzzer 执行连续的活性检查以检测故障。然而，这种类型的模糊测试有三个局限性:</p>
+<ol>
+<li>目标应用程序应该可以从网络访问</li>
+<li>通常很慢</li>
+<li>固件崩溃或故障由于静默内存损坏而难以检测</li>
+</ol>
+<h4 id="5-2-3-串口"><a href="#5-2-3-串口" class="headerlink" title="5.2.3 串口"></a>5.2.3 串口</h4><p>串口是<strong>异步串行通信的接口</strong>，是嵌入式设备中最常⻅的协议之一。因此，它被用作模糊测试的桥梁。例如，beSTORM是一种自动动态测试工具(即模糊器)，用于验证任何使用高速 UART的软件或产品的安全性。虽然这个工具是一个黑盒模糊器，但它通常会产生令人满意的结果，因为它包含许多协议标准，例如 UART，并支持审计特定协议，从而执行智能模糊测试。其他研究人员使用了Arduino模糊嵌入式设备上的调试引脚，然后 使用Arduino作为 USB 转串口转换器与设备通信并获得外壳。此外，UART通常用作模糊测试 桥，并经常用作连接介质以促进仿真。在其他的一些研究中，UART被用作传输内存状态的通信通道。另外，由于UART支持串口通信，可以作为数据通道，如发送中断或数据等。</p>
+<h4 id="5-2-4-JTAG"><a href="#5-2-4-JTAG" class="headerlink" title="5.2.4 JTAG"></a>5.2.4 JTAG</h4><p>JTAG是一种标准接口，用于验证印刷电路板的设计和测试引脚。JTAG模糊测试不存在。然而，JTAG 可以用作连接介质，以促进类似于 UART 的仿真。在几项研究中，通过带有内存存根的JTAG调试器将外设输入和输出转发到 实际设备。此外，当仿真和物理设备之间需要通信时，JTAG接口支持访问 CPU 状态、寄存器 和内存。总之，JTAG通常用于连接仿真器和真实设备，而不是模糊测试目标接口。</p>
+<h3 id="5-3-固件仿真"><a href="#5-3-固件仿真" class="headerlink" title="5.3 固件仿真"></a>5.3 固件仿真</h3><h4 id="5-3-1-仿真粒度"><a href="#5-3-1-仿真粒度" class="headerlink" title="5.3.1 仿真粒度"></a>5.3.1 仿真粒度</h4><p>在<strong>系统模式仿真</strong>中，固件映像类似于虚拟机进行仿真，并且应支持所有外围设备。该仿真是 QEMU 提供的基本仿真. 但是，它的工作量是庞大的并且比用戶模式仿真慢。</p>
+<p><strong>用戶模式仿真</strong>执行为一个编译的进程中央处理器(CPU)在另一个CPU上提供便利和效率。因此，它支持系统调用翻译、信号处理和线程。系统调用翻译是指将PUT的系统调用转换为主机的系统调用。此外，用戶模式仿真可以将PUT中的所有信号重定向到主机的信号处 理程序。它还可以模拟克隆系统调用并为每个模拟线程创建一个真正的主机线程。总之，系统模式模拟将固件模拟为整个系统，而用戶模式模拟为方便起⻅模拟另一个CPU上的进程。</p>
+<p>系统模式仿真需要手动提取，例如文件系统提取、自定义内核配置和运行系统模式QEMU。因此，Firmadyne作者通过在系统模式仿真中添加自动工作来进行全系统仿真。添加的自动化工作包括从固件中提取文件系统、配置定制内核、开发虚拟网络接口以及运行系统模式QEMU。同时，一些作品使用部分仿真，因为上面提到的仿真并不完美和准 确。部分仿真，也称为混合仿真，将仿真环境与实际设备相结合，将仿真无法处理的所有项目 转发给实际设备。因此，部分仿真具有准确性和可扩展性的优点，但也有需要实际设备的缺点。</p>
+<p>另一种混合仿真是 Firm-AFL 使用的增强过程仿真. 增强过程仿真将系统模式仿真与用戶 模式仿真相结合，以提高模糊测试的吞吐量。因此，他们实现了内存映射，一个 RAM 文件，它是系统模式和用戶模式模拟器之间共享的内存映射文件，以及系统调用重定向。因此，Firm-AFL 显示了高吞吐量的模糊测试结果，并发现了两个未知漏洞。</p>
+<h4 id="5-3-2-主流的仿真器"><a href="#5-3-2-主流的仿真器" class="headerlink" title="5.3.2 主流的仿真器"></a>5.3.2 主流的仿真器</h4><p><img src="https://www.z4a.net/images/2023/06/14/9bc18522926f1919b.jpg" alt="9bc18522926f1919b.jpg"><br>QEMU 和 Simics 模拟一个完整的系统，包括 CPU 和外围设备，所以它们很重。同时，Unicorn 只模拟 CPU，因此它是轻量级的。由于Unicorn在没有执行环境的情况下模拟 CPU，因此非常灵活。但是，当需要更准确的仿真时，它需要其他实现。虽然 QEMU 有很多相关的漏洞，但 Unicorn 和 Simics 目前还没有漏洞。</p>
+<p>**QEMU(即Quick Emulator)**是一个通用的开源模拟器，具有模拟处理器和外围设备的独特功能，支持多架构和多平台，并且长期维护。它同时翻译几个基本块，提供一套虚拟硬件和设备，运行各种操作系统。QEMU 还可以模拟用戶级进程，这些进程在另一个 CPU 上执行为一个 CPU 编译的进程。由于 QEMU 发明后，许多模糊测试研究人员使用 QEMU 作为仿真引擎。 尽管 QEMU 的功能不足，但一些研究人员将其与其他功能相结合，例如实际的硬件支持 [70,138 ] 或增强过程仿真. Firmadyne 的作者添加了四个功能来解决当前仿真的局限性。首 先，他们修改了 QEMU 以支持 NVRAM 相关功能，因为原始 QEMU 没有提供此类支持。其次， QEMU 使用预编译内核启动提取的文件系统，因为它无法支持从所有固件中提取的每个内核。 有了这些用于 ARM 小端、MIPS 小端和 MIPS 大端平台的预编译内核，它们可以覆盖 90.8% 的 数据集。第三，他们的 QEMU 有一种学习模式，在这种模式下，他们修改后的内核会记录所有 系统交互。最后，Firmadyne 启动提取的固件映像并执行网络连接检查。</p>
+<p><strong>Unicorn</strong>是一个轻量级的多架构CPU仿真器框架。它源自 QEMU，但它比 QEMU 有几个优点，如表所示7. 首先，Unicorn 是一个框架，任何人都可以在其中开发工具。其次，它只模拟 CPU，因此轻巧灵活。它可以在没有执行环境的情况下模拟原始二进制代码，但 QEMU 需要整个系统映像或可执行二进制文件。第三，QEMU 不能提供动态检测，而 Unicorn 支持针对多种类型的 CPU 事件的自定义处理程序。这种支持使专家可以创建用于仿真的仪器工 具。最后，根据 CVE 网站 ，而且都是来自外围设备、输入输出设备等子系统。但是， Unicorn 目前没有任何暴露的漏洞。因此，它比 QEMU 更安全。</p>
+<p><strong>Simics</strong>是一个商业全系统模拟器，模拟复杂数字系统的硬件和软件。由于 Simics 提供指令级保真度和硬件模型，可支持ARM、MIPS(32&#x2F;64位)、Alpha、x86-64、 IA-64、MSP430、PowerPC(32&#x2F;64位)、SPARC-V8、V9等10余种处理器。它还支持通用操作 系统(即Windows、Linux、Solaris 等)以及实时操作系统(即VxWorks 和QNX)。由于 Simics 是一个足够快的商业模拟器，具有足够的保真度和准确性，已广泛应用于各行各业。另一方面，QEMU 是一个开源机器仿真器，并在学术界广泛使用。因此大多数基于仿真的模糊器、使用 QEMU 作为他们的仿真平台。</p>
+<h3 id="5-4-Fuzz"><a href="#5-4-Fuzz" class="headerlink" title="5.4 Fuzz"></a>5.4 Fuzz</h3><p>第一种 ESF 是<strong>网络模糊测试</strong>。Prospect、FirmFuzz 和 IoT-Fuzzer 包括网络模糊器。Prospect使用<strong>黑盒模糊测试</strong>，它设置了一个代理来将仿真环境连接到实际的嵌入式系统。代理捕获网络数据包，内部模糊器生成随机流量。具体来说，它从捕获的网络流量中获取数据包，在任意位置随机化 1 个字节，然后不跳过地重放通信。这是一个典型的黑盒模糊测试操作，但并不智能。因此，智能模糊器 FirmFuzz被提议。FirmFuzz 采用<strong>基于生成的灰盒模糊器</strong>。它进行静态分析并使用无需创建标准 HTTP 数据包的命令行浏览器，从而轻松创建基于生成的模糊器。IoTFuzzer进行了动态分析以识别物联网应用程序的消息，并对消息进行变异以制定目标设备的测试用例。这种突变既是一种无需复杂协议分析的简单方法，也是一种有用的技术，因为它不需要考虑加密。<br><img src="https://www.z4a.net/images/2023/06/14/10b0ea6857d38c0ec1.jpg" alt="10b0ea6857d38c0ec1.jpg"><br>Prospect使用简单的黑盒模糊测试，不需要预处理，所以速度很快，但结果并不理想。同时，FirmFuzz 利用静态分析进行智能模糊测试，获得了令人满意的结果。最后，IoTFuzzer 需要动态的物联网应用分析;因此，它相对较慢，但显示出可喜的结果。总之，每个网络模糊器都根据其策略和目的有利有弊。</p>
+<p>第二种ESF是<strong>符号执行</strong>. 符号执行将变量视为符号。当满足路径约束时，符号 可以是满足约束的任意值。因此，<strong>理论上，符号执行会探索程序中的所有路径。</strong>例如，FIE使用 KLEE符号执行引擎提供固件程序的可扩展检查。然而，符号执行有以下缺点：<strong>状态爆炸</strong>，它会产生许多它应该探索的程序路径。</p>
+<p>混合模糊测试结合了模糊测试和 concolic(或符号)执行，以实现更广泛和更深入的程序测 试覆盖率. 到目前为止，ESF 域中没有可用的混合模糊器。</p>
+<p>作为<strong>基于覆盖的灰盒模糊器</strong>在传统的模糊测试中表现出了典范的性能，它们可以适应ESF。基于覆盖率的模糊器通过计算已执行的基本块和程序的基本块总数的比例来测量代码覆盖率，然后使用此信息来识别未访问的程序块(即扩大代码覆盖率)。基于覆盖的模糊器旨在测试程序的每个路径分支(即 PUT)。这些模糊器的一个典型例子是 <strong>Firm-AFL</strong>. 该模糊器具有高吞吐量，因为其增强的过程仿真使在用戶模式仿真中快速测试目标程序成为可能。</p>
+<p>虽然基于覆盖的模糊器的<strong>特点是扩大代码覆盖范围</strong>，但定向模糊器将大部分执 行时间花在到达特定目标点(例如，<strong>bugsuspicious</strong> 区域)上。例如，<strong>FirmCorn</strong>使用易受攻击的代码搜索算法进行定向模糊测试。由于漏洞代码搜索算法的有效性，FirmCorn 可以实现非常有效的崩溃时间。传统模糊研究中的定向模糊测试有两种类型:定向灰盒模糊测试和定向白盒模糊测试。</p>
+<p><strong>AFLGo</strong>的作者引入了定向灰盒模糊测试，它生成引导模糊器到目标点的输入。他们提出了一种新的功率调度器，可以为通向目标点的测试输入分配更多功率。在另一个例子中，<strong>Hawkeye</strong>进行了静态分析以收集有关程序和目标位置的信息，然后根据这些信息执行程序。该策略使 Hawkeye 对目标进行模糊测试并显示出更好的结果。</p>
+<p><strong>BuzzFuzz</strong>利用动态污点跟踪来模糊测试一个检测程序，然后在生成的输入上运行该程序以确定输入是否包含任何错误。这种方法使随机模糊测试能够探索深层程序代码，同时保留输入的语义形式。这种方法在用戶识别程序攻击点时很有用，但它不能检测出意想不到的错误，并且需要很⻓时间来测试很多点。在另一个例子中，TaintScope使用动态污点分析和符号 执行来绕过阻止程序执行到达深层程序代码部分的校验和机制。<strong>TaintScope</strong>中的执行监视器识 别哪些输入字节控制参数以及哪些输入字节与校验和相关。然后，它生成一个旁路输入。当一个程序有校验和机制，但这需要预处理开销(即动态污点跟踪)。此外，白盒模糊测试有一个缺点，即需要很⻓时间来探索所有可能的路径。</p>
+<h3 id="5-5-目标监控"><a href="#5-5-目标监控" class="headerlink" title="5.5 目标监控"></a>5.5 目标监控</h3><p>嵌入式系统中的崩溃很难检测到。因此，已经提出了几种响应监测方法。首先，网络心跳检查广泛用于基于网络的模糊器，以检测某些嵌入式系统的挂起或无效。其次，传统模糊测试中的崩溃检测方法也可以在ESF中使用signal handlers和memory sanitizers，例如，当模糊器发现崩溃时，会发出诸如信号 11(分段违规)或信号 10(SIGUSR)之类的信号。模糊器中的监控模块捕获并处理该信号。第三，一些嵌入式设备在遇 到内存损坏时会重新启动。这种现象通常发生在 Type 3 设备中，但模糊器不会自动处理它。</p>
+<p>首先，基于网络的模糊器，例如<strong>IoTFuzzer</strong>，检查目标设备的活跃度。它通过发送任意实时检查消息来猜测程序的活跃度。有些研究方法还使用了 liveness 检查。值得注意的是，他们彻底分析了目标设备的响应行为，<strong>并将响应分为六种类型:可观察到的崩溃、重启、挂起、后期崩溃、故障和无效。</strong>。<strong>FirmFuzz</strong>通过监控模拟固件生成的日志来检测漏洞。当它模拟目标固件时，这种技术是有利的。此外，它还可以 检测其他漏洞，例如命令注入, 空指针取消引用，以及跨站脚本因为这些漏洞可 以通过执行日志检测到。内存损坏的另一种检测方法是由信号处理程序进行的. 他们在仿真器中监视程序执行并检测到诸如分段错误之类的信号。这种方法在传统的fuzzing中被广泛 使用，与AddressSanitizer (ASAN). ASAN还可以通过使用编译器工具和运行时库来帮助 检测内存错误。</p>
+<h3 id="5-6-异常分析"><a href="#5-6-异常分析" class="headerlink" title="5.6 异常分析"></a>5.6 异常分析</h3><p>在模糊器检测到 PUT 的崩溃或错误后，它会确认发现的错误是否易受攻击。此步骤由分析师手动执行，或由模糊器中包含的程序工具自动执行. 如果模糊器发现大量崩溃，模糊器或分析师会检查数据重复。因此，分析师会发现独特的漏洞。请注意，分析师在调试嵌入式系统应 用程序时使用 GNU 调试器和 gdbserver. 这具有通过在远离目标系统的主机系统中执行实 际调试来减少性能开销的优势。此外，大多数模糊器使用异常分析的结果作为对下一次模糊测 试运行的反馈。例如，基于覆盖的模糊器使用代码覆盖率信息来选择下一个种子。同时，基于污点的定向模糊器使用从程序入口点到目标的动态污点结果或距离信息. </p>
+<h3 id="5-7-种子调度"><a href="#5-7-种子调度" class="headerlink" title="5.7 种子调度"></a>5.7 种子调度</h3><p>分析异常后，模糊器生成种子并选择下一个种子。基于覆盖的模糊器生成新种子以扩大代码覆盖范围，定向模糊器生成新种子以更接近目标点。例如，<strong>Firm-AFL</strong>使用轻量级仪器来扩大分支覆盖范围，并且该仪器在计算分支覆盖范围时包括粗略的分支命中计数. 另一个模糊器，<strong>FirmCorn</strong>，在静态分析阶段计算API函数的漏洞特征排名，hook可疑函数，并改变函数的输入以扩大代码覆盖范围。特别是，FirmCorn 使用基于启发式的突变，例如位翻转操作。同时，<strong>AFLGo</strong>(即，定向灰盒模糊器)测量所选种子与目标点集之间的距离。然后，它计算到目标点的最短路径控制流图(CFG)并使用触发种子沿着路径执行程序。这个触发种子将模糊器引导到特定的程序点。</p>
+<h2 id="6-性能比较"><a href="#6-性能比较" class="headerlink" title="6.性能比较"></a>6.性能比较</h2><p>根据我们的分类法比较基于三组的嵌入式模糊器。直接模糊测试、基于仿真的模糊测试和固件分析。然而，由于使用固件分析的模糊器很少，而且它们的运行环境非常不同，我们讨论了两组的性能比较:<strong>直接模糊测试和基于仿真的模糊测试。</strong></p>
+<p>基于网络的嵌入式模糊器的性能比较：<br><img src="https://www.z4a.net/images/2023/06/14/115036887d93aef241.jpg" alt="115036887d93aef241.jpg"></p>
+<p>基于仿真的嵌入式模糊器的性能比较：<br><img src="https://www.z4a.net/images/2023/06/14/1229cc1d6d3929d7fd.jpg" alt="1229cc1d6d3929d7fd.jpg"></p>
+<h2 id="7-工具的使用"><a href="#7-工具的使用" class="headerlink" title="7. 工具的使用"></a>7. 工具的使用</h2><h3 id="7-1-模糊测试框架"><a href="#7-1-模糊测试框架" class="headerlink" title="7.1 模糊测试框架"></a>7.1 模糊测试框架</h3><p>Avatar和Avatar2提出了一个多目标编排框架，将仿真器或调试器等动态分析系统与真实设备相结合。当分析师为嵌入式系统制作调试或测试系统时，此框架很有用。但是，它不是完全自动化的，需要进行一些将真实设备连接到框架的工作。</p>
+<h3 id="7-2-固件模糊器"><a href="#7-2-固件模糊器" class="headerlink" title="7.2 固件模糊器"></a>7.2 固件模糊器</h3><p>许多模糊测试系统将整个固件作为输入，只有少数系统测试文件系统程序之外的引导加载程序或操作系统等部分。</p>
+<h3 id="7-3-文件系统程序的模糊器"><a href="#7-3-文件系统程序的模糊器" class="headerlink" title="7.3 文件系统程序的模糊器"></a>7.3 文件系统程序的模糊器</h3><p>许多嵌入式模糊器可以测试嵌入式设备文件系统中的每个程序。许多模糊器可以分析固件中的可执行程序。当他们从设备中提取固件并在模拟器中执行时，他们可以访问文件系统中的每个程序。如果模糊器可以访问某些程序，则接收程序文件的文件模糊器可以开始执行程序。然而，攻击者对向 Internet 提供网络服务的服务器程序特别感兴趣，因为它们可以从网络外部访问(即攻击者)。因此，虽然模糊器可以测试系统中的每个程序，但模糊测试文章通常表明漏洞主要存在于服务器程序中。尽管攻击者对服务器程序以外的漏洞不感兴趣，但安全专家需要解决这些漏洞，因为它们可能会被其他攻击所利用，例如本地权限提升。</p>
+<h3 id="7-4-服务器程序的模糊器"><a href="#7-4-服务器程序的模糊器" class="headerlink" title="7.4 服务器程序的模糊器"></a>7.4 服务器程序的模糊器</h3><p>模糊服务器程序(即守护进程)的访问方法有三种类型。首先，一些模糊器从模拟器 中的固件中提取并运行文件系统，然后对服务器程序进行模糊测试。该方法具有性能高、结果好的优点。其次，基于网络协议的模糊器是最适合模糊服务器程序的类型。这种方法直观方便，但缺点是目标程序有限。考虑到黑客通常从 Internet 进行攻击，这个范围就足够了。最后，一些模糊器使用JTAG或UART等调试接口可以测试服务器程序。这种方法的优点在于它可以用调试信息对服务器程序进行模糊测试。但是，此方法需要创建调试环境的手动工作。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="nwpuhkp">NWPUHKP</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://nwpuhkp.github.io/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/">http://nwpuhkp.github.io/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://nwpuhkp.github.io" target="_blank">The Blog of NWPUHKP</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8/">安全</a><a class="post-meta__tags" href="/tags/%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/">模糊测试</a></div><div class="post_share"><div class="social-share" data-image="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img class="cover" src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">ROP初探之ret2shellcode</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img class="cover" src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">论文阅读-Live Trojan Attacks on Deep Neural Networks</div></div></a></div><div><a href="/2023/04/03/RSA/" title="RSA密码总结"><img class="cover" src="https://www.z4a.net/images/2023/04/08/into.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">RSA密码总结</div></div></a></div><div><a href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img class="cover" src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-05</div><div class="title">ROP初探之ret2text</div></div></a></div><div><a href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img class="cover" src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-06</div><div class="title">ROP初探之ret2shellcode</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NWPUHKP</div><div class="author-info__description">且视他人之疑目如盏盏鬼火，大胆地去走你的夜路</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/nwpuhkp"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/nwpuhkp" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:kepuhuang@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://space.bilibili.com/57507739" target="_blank" title="Bilibili"><i class="fab fa-bilibili"></i></a><a class="social-icon" href="https://weibo.com/u/6035177688" target="_blank" title="Weibo"><i class="fab fa-weibo"></i></a><a class="social-icon" href="https://s1.ax1x.com/2023/04/02/ppf2g2T.jpg" target="_blank" title="Wechat"><i class="fab fa-weixin"></i></a><a class="social-icon" href="https://twitter.com/huangkepu" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-Fuzzing-of-Embedded-Systems-A-Survey"><span class="toc-number">1.</span> <span class="toc-text">论文阅读-Fuzzing of Embedded Systems: A Survey</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Introduction"><span class="toc-number">1.1.</span> <span class="toc-text">1. Introduction</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Motivation"><span class="toc-number">1.1.1.</span> <span class="toc-text">1.1 Motivation</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-SURVEY-METHOD"><span class="toc-number">1.2.</span> <span class="toc-text">2. SURVEY METHOD</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E7%A0%94%E7%A9%B6%E9%97%AE%E9%A2%98"><span class="toc-number">1.2.1.</span> <span class="toc-text">2.1 研究问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%B5%8C%E5%85%A5%E5%BC%8F%E7%B3%BB%E7%BB%9F%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-number">1.3.</span> <span class="toc-text">3. 嵌入式系统模糊测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%B5%8C%E5%85%A5%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%8F%8A%E5%85%B6%E5%9B%BA%E4%BB%B6"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1 嵌入式系统及其固件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B5%8C%E5%85%A5%E5%BC%8F%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">嵌入式系统</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%BA%E4%BB%B6"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">固件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%B5%8C%E5%85%A5%E5%BC%8F%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2 嵌入式系统的分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E4%BC%A0%E7%BB%9FFuzzing%E4%B8%8EESF%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.3 传统Fuzzing与ESF的比较</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-1-%E7%A1%AC%E4%BB%B6%E4%BE%9D%E8%B5%96%E6%80%A7%E5%BC%BA"><span class="toc-number">1.3.3.1.</span> <span class="toc-text">3.3.1 硬件依赖性强</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-2-%E5%B4%A9%E6%BA%83%E6%A3%80%E6%B5%8B"><span class="toc-number">1.3.3.2.</span> <span class="toc-text">3.3.2 崩溃检测</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-3-Instrumentation"><span class="toc-number">1.3.3.3.</span> <span class="toc-text">3.3.3 Instrumentation</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-4%E6%80%A7%E8%83%BD%E5%92%8C%E5%8F%AF%E6%89%A9%E5%B1%95%E6%80%A7"><span class="toc-number">1.3.3.4.</span> <span class="toc-text">3.3.4性能和可扩展性</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-Fuzzer%E7%9A%84%E4%BC%A0%E7%BB%9F%E5%88%86%E7%B1%BB"><span class="toc-number">1.3.4.</span> <span class="toc-text">3.4 Fuzzer的传统分类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-1-%E9%BB%91%E7%9B%92fuzzer"><span class="toc-number">1.3.4.1.</span> <span class="toc-text">3.4.1 黑盒fuzzer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-2-%E7%99%BD%E7%9B%92fuzzer"><span class="toc-number">1.3.4.2.</span> <span class="toc-text">3.4.2 白盒fuzzer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-3-%E7%81%B0%E7%9B%92fuzzer"><span class="toc-number">1.3.4.3.</span> <span class="toc-text">3.4.3 灰盒fuzzer</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%B5%8C%E5%85%A5%E5%BC%8F%E7%B3%BB%E7%BB%9FFuzzer%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-number">1.4.</span> <span class="toc-text">4. 嵌入式系统Fuzzer的分类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E5%88%86%E7%B1%BB"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.1 分类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-1-%E7%9B%B4%E6%8E%A5%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">4.1.1 直接模糊测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-2-%E5%9F%BA%E4%BA%8E%E4%BB%BF%E7%9C%9F%E7%9A%84%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">4.1.2 基于仿真的模糊测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-3-%E5%9B%BA%E4%BB%B6%E5%88%86%E6%9E%90"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">4.1.3 固件分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E4%B8%BB%E6%B5%81%E7%9A%84Fuzzer%EF%BC%88%E9%97%AD%E6%BA%90-x2F-%E5%BC%80%E6%BA%90%EF%BC%89"><span class="toc-number">1.4.2.</span> <span class="toc-text">4.2 主流的Fuzzer（闭源&#x2F;开源）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%AF%A6%E7%BB%86%E7%9A%84Fuzz%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.5.</span> <span class="toc-text">5. 详细的Fuzz步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%9B%BA%E4%BB%B6%E8%8E%B7%E5%8F%96"><span class="toc-number">1.5.1.</span> <span class="toc-text">5.1 固件获取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.5.2.</span> <span class="toc-text">5.2 接口</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-1-%E5%9B%BA%E4%BB%B6"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">5.2.1 固件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-2-%E7%BD%91%E7%BB%9C"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">5.2.2 网络</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-3-%E4%B8%B2%E5%8F%A3"><span class="toc-number">1.5.2.3.</span> <span class="toc-text">5.2.3 串口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-4-JTAG"><span class="toc-number">1.5.2.4.</span> <span class="toc-text">5.2.4 JTAG</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%9B%BA%E4%BB%B6%E4%BB%BF%E7%9C%9F"><span class="toc-number">1.5.3.</span> <span class="toc-text">5.3 固件仿真</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-3-1-%E4%BB%BF%E7%9C%9F%E7%B2%92%E5%BA%A6"><span class="toc-number">1.5.3.1.</span> <span class="toc-text">5.3.1 仿真粒度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-3-2-%E4%B8%BB%E6%B5%81%E7%9A%84%E4%BB%BF%E7%9C%9F%E5%99%A8"><span class="toc-number">1.5.3.2.</span> <span class="toc-text">5.3.2 主流的仿真器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-Fuzz"><span class="toc-number">1.5.4.</span> <span class="toc-text">5.4 Fuzz</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-%E7%9B%AE%E6%A0%87%E7%9B%91%E6%8E%A7"><span class="toc-number">1.5.5.</span> <span class="toc-text">5.5 目标监控</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-6-%E5%BC%82%E5%B8%B8%E5%88%86%E6%9E%90"><span class="toc-number">1.5.6.</span> <span class="toc-text">5.6 异常分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-7-%E7%A7%8D%E5%AD%90%E8%B0%83%E5%BA%A6"><span class="toc-number">1.5.7.</span> <span class="toc-text">5.7 种子调度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%80%A7%E8%83%BD%E6%AF%94%E8%BE%83"><span class="toc-number">1.6.</span> <span class="toc-text">6.性能比较</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">1.7.</span> <span class="toc-text">7. 工具的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95%E6%A1%86%E6%9E%B6"><span class="toc-number">1.7.1.</span> <span class="toc-text">7.1 模糊测试框架</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-%E5%9B%BA%E4%BB%B6%E6%A8%A1%E7%B3%8A%E5%99%A8"><span class="toc-number">1.7.2.</span> <span class="toc-text">7.2 固件模糊器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%A8%A1%E7%B3%8A%E5%99%A8"><span class="toc-number">1.7.3.</span> <span class="toc-text">7.3 文件系统程序的模糊器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-4-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%A8%A1%E7%B3%8A%E5%99%A8"><span class="toc-number">1.7.4.</span> <span class="toc-text">7.4 服务器程序的模糊器</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Fuzzing of Embedded Systems A Survey"/></a><div class="content"><a class="title" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey">论文阅读-Fuzzing of Embedded Systems A Survey</a><time datetime="2023-06-14T08:54:36.000Z" title="发表于 2023-06-14 16:54:36">2023-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2shellcode"/></a><div class="content"><a class="title" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode">ROP初探之ret2shellcode</a><time datetime="2023-05-06T12:20:36.000Z" title="发表于 2023-05-06 20:20:36">2023-05-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2text"/></a><div class="content"><a class="title" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text">ROP初探之ret2text</a><time datetime="2023-05-05T10:58:16.000Z" title="发表于 2023-05-05 18:58:16">2023-05-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/08/learnofpth/" title="深入理解Pytorch中模型保存文件pth"><img src="https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="深入理解Pytorch中模型保存文件pth"/></a><div class="content"><a class="title" href="/2023/04/08/learnofpth/" title="深入理解Pytorch中模型保存文件pth">深入理解Pytorch中模型保存文件pth</a><time datetime="2023-04-08T01:29:43.000Z" title="发表于 2023-04-08 09:29:43">2023-04-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Live Trojan Attacks on Deep Neural Networks"/></a><div class="content"><a class="title" href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks">论文阅读-Live Trojan Attacks on Deep Neural Networks</a><time datetime="2023-04-03T06:27:54.000Z" title="发表于 2023-04-03 14:27:54">2023-04-03</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png')"><div id="footer-wrap"><div class="copyright">&copy;2023 By NWPUHKP</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a>&nbsp;<a target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a>&nbsp;<a target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a>&nbsp;<a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a>&nbsp;<a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/"><span>备案号：陕ICP备2022011597号-1</span></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
