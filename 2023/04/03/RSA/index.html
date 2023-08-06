@@ -1,0 +1,291 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>RSA密码总结 | The Blog of NWPUHKP</title><meta name="author" content="NWPUHKP"><meta name="copyright" content="NWPUHKP"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="RSA公钥密码总结RSA基本流程 选择两个大的参数，计算出模数 N &#x3D; p * q  计算欧拉函数 φ &#x3D; (p-1) * (q-1)，然后选择一个e(1&lt;e&lt;φ)，并且e和φ互质, 互质：公约数只有1的两个整数  取e的模反数d，计算方法为:e * d ≡ 1 (mod φ)  模反元素，也叫模逆元素，是指满足以下公式的整数b：a * b ≡ 1 (mod n)，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RSA密码总结">
+<meta property="og:url" content="http://nwpuhkp.github.io/2023/04/03/RSA/index.html">
+<meta property="og:site_name" content="The Blog of NWPUHKP">
+<meta property="og:description" content="RSA公钥密码总结RSA基本流程 选择两个大的参数，计算出模数 N &#x3D; p * q  计算欧拉函数 φ &#x3D; (p-1) * (q-1)，然后选择一个e(1&lt;e&lt;φ)，并且e和φ互质, 互质：公约数只有1的两个整数  取e的模反数d，计算方法为:e * d ≡ 1 (mod φ)  模反元素，也叫模逆元素，是指满足以下公式的整数b：a * b ≡ 1 (mod n)，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.z4a.net/images/2023/04/08/into.jpg">
+<meta property="article:published_time" content="2023-04-03T06:08:16.000Z">
+<meta property="article:modified_time" content="2023-04-08T01:38:52.416Z">
+<meta property="article:author" content="NWPUHKP">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="密码学">
+<meta property="article:tag" content="公钥密码">
+<meta property="article:tag" content="RSA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.z4a.net/images/2023/04/08/into.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://nwpuhkp.github.io/2023/04/03/RSA/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: {"limitDay":500,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":80,"languages":{"author":"作者: NWPUHKP","link":"链接: ","source":"来源: The Blog of NWPUHKP","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'RSA密码总结',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-08 09:38:52'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://www.z4a.net/images/2023/04/08/into.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="The Blog of NWPUHKP"><span class="site-name">The Blog of NWPUHKP</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">RSA密码总结</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-03T06:08:16.000Z" title="发表于 2023-04-03 14:08:16">2023-04-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-04-08T01:38:52.416Z" title="更新于 2023-04-08 09:38:52">2023-04-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80/">安全基础</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80/%E5%AF%86%E7%A0%81%E5%AD%A6/">密码学</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>14分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="RSA密码总结"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="RSA公钥密码总结"><a href="#RSA公钥密码总结" class="headerlink" title="RSA公钥密码总结"></a>RSA公钥密码总结</h1><h2 id="RSA基本流程"><a href="#RSA基本流程" class="headerlink" title="RSA基本流程"></a>RSA基本流程</h2><ol>
+<li><p>选择两个大的参数，计算出模数 N &#x3D; p * q</p>
+</li>
+<li><p>计算欧拉函数 φ &#x3D; (p-1) * (q-1)，然后选择一个e(1&lt;e&lt;φ)，并且e和φ互质, <code>互质：公约数只有1的两个整数</code></p>
+</li>
+<li><p>取e的模反数d，计算方法为:e * d ≡ 1 (mod φ) </p>
+<p><code>模反元素，也叫模逆元素，是指满足以下公式的整数b：a * b ≡ 1 (mod n)，也就是说，a和b相乘后除以n的余数是1。模反元素存在的条件是a和n互质，即它们没有公约数。例如：3和11互质，那么3的模反元素就是4，因为3 * 4 ≡ 1 (mod 11)。同理，4的模反元素也是3。</code></p>
+</li>
+<li><p>对明文m进行加密：c &#x3D; pow(m, e, N),可以得到密文c。</p>
+</li>
+<li><p>对密文c进行解密：m &#x3D; pow(c, d, N),可以得到明文m。</p>
+</li>
+</ol>
+<p><code>pow是一个数学函数，它用来计算一个数的另一个数的次方。比如，pow(2, 3)就是计算2的3次方，结果是8。pow函数可以有三个参数，第三个参数是对结果取模。比如，pow(2, 3, 5)就是计算2的3次方后对5取模，结果是3。</code></p>
+<p>其中：</p>
+<ul>
+<li>p 和 q：两个大的质数，是另一个参数<code>N</code>的的两个因子。</li>
+<li>N：大整数，可以称之为<code>模数</code></li>
+<li>e 和 d：互为模反数的两个指数</li>
+<li>c 和 m：密文和明文</li>
+<li>(N, e)：公钥 <code>公开，所有人可知</code></li>
+<li>(p, q, φ, d)：私钥 <code>保密</code></li>
+<li>pow(x, y, z)：效果等效于<code>pow(x,y) % z</code>， 先计算x的y次方，如果存在另一个参数<code>z</code>，需要再对结果进行取模。</li>
+<li>密钥长度：n以二进制表示的的位数，例如密钥长度为512代表n用二进制表示的长度为512bit。</li>
+</ul>
+<h2 id="RSA安全性分析"><a href="#RSA安全性分析" class="headerlink" title="RSA安全性分析"></a>RSA安全性分析</h2><p>对于RSA加密算法，公钥<code>(N, e)</code>为公钥，可以任意公开，破解RSA最直接（亦或是暴力）的方法就是分解整数<code>N</code>，然后计算<code>欧拉函数φ(n)=(p-1) * (q-1)</code>,再通过<code>d * e ≡ 1 mod φ(N)</code>，即可计算出 <code>d</code>，然后就可以使用私钥<code>(N, d)</code>通过<code>m = pow(c,d,N)</code>解密明文。</p>
+<h3 id="RSA安全性的要求"><a href="#RSA安全性的要求" class="headerlink" title="RSA安全性的要求"></a>RSA安全性的要求</h3><ol>
+<li>定期更换密钥</li>
+<li>选择两个足够大的素数p和q，使得n&#x3D;p*q的长度至少600位以上，以防止被暴力破解或者数学方法分解。</li>
+<li>不同的用户不可以使用相同的模数N</li>
+<li>p与q的差值要大，最好是差几个比特</li>
+<li>p-1与q-1都应该有大的素因子，一般建议选择的两个大素数p、q使得p&#x3D;2p+1和q&#x3D;2q+1也是素数</li>
+<li>e的选择不要太小，一般为65537，这样可以提高加密速度，并且要求e和(p-1)*(q-1)互质，以保证存在私钥指数d。</li>
+<li>d的选择也是不可以太小，最好满足<code>d&gt;=n的4分之1</code></li>
+<li>选择一个合适的数据分组长度m，使得m接近n的长度，并且每个分组都小于n，这样可以提高加密强度，并且避免数据格式不标准化。</li>
+</ol>
+<h2 id="常用的攻击方法"><a href="#常用的攻击方法" class="headerlink" title="常用的攻击方法"></a>常用的攻击方法</h2><ul>
+<li><strong>基于因子分解的攻击</strong>，即试图通过数学方法或者暴力破解找到n的两个素数因子p和q，从而计算出私钥d。这类攻击的难度取决于n的长度和p和q的选择，一般需要n至多256位，并且p和q相差不要太大或太小。</li>
+<li><strong>基于系统设计和实现的攻击</strong>，即利用RSA算法本身或者其应用场景中存在的一些漏洞或者缺陷来获取密文或者私钥。这类攻击有很多种，比如低加密指数攻击、共模数攻击、重复密文攻击、填充攻击等等。</li>
+</ul>
+<h3 id="直接分解模数N"><a href="#直接分解模数N" class="headerlink" title="直接分解模数Ｎ"></a>直接分解模数Ｎ</h3><p>直接分解模数n是一种RSA攻击方法，它的原理是试图找到n的两个素数因子p和q，从而计算出私钥d。这是因为RSA算法的安全性依赖于大整数分解的困难性，如果n可以被分解，那么就可以通过欧拉函数和模逆运算求出d。</p>
+<p>但是这种攻击方法只适用于n比较小的情况，<code>如果n的长度超过了256位，那么用现有的计算机和算法很难在短时间内完成分解。</code>所以RSA算法要求选择足够大的p和q来生成n，以提高安全性。</p>
+<p>例如，有一个公钥 (n,e) &#x3D; (143, 7)，其中n &#x3D; 143是两个素数的乘积，e &#x3D; 7是加密指数。我们可以用一些工具或者算法来试图分解n，比如试除法、费马分解法、二次筛选法等等。这里我们用试除法，即从2开始逐个尝试能否整除n的数。我们发现11可以整除n，即 n &#x3D; 11 * 13，所以p &#x3D; 11，q &#x3D; 13。有了p和q，我们就可以计算出欧拉函数 f(n) &#x3D; (p-1)(q-1) &#x3D; 120，并且用扩展欧几里得算法求出d，使得 ed ≡ 1 mod f(n)，即 d &#x3D; 103。这样我们就得到了私钥 (n,d) &#x3D; (143,103)。</p>
+<p>若采用费马分解法，费马分解法的思想是将n表示为两个平方数之差，即 n &#x3D; x^2 - y^2 &#x3D; (x+y)(x-y)，然后试图找到合适的x和y，使得x+y和x-y都是素数。例如，假设我们有一个模数n &#x3D; 5959，我们可以从 sqrt(n) 向上取整开始尝试，即 x &#x3D; 78，y &#x3D; 1，此时 n - x^2 &#x3D; -25，不是完全平方数，所以继续增加x，减少y。当 x &#x3D; 79，y &#x3D; 4时，n - x^2 &#x3D; 16 &#x3D; y^2，此时 n &#x3D; x^2 - y^2 &#x3D; (x+y)(x-y) &#x3D; 83 * 71。所以p &#x3D; 83，q &#x3D; 71。</p>
+<p>当模数n小于256位时，可以采用Windows平台的RSATool工具，miseve、yafu等工具。</p>
+<p><strong>题目：给出RSA公钥 {e,n} 和密文 c，求明文 m。</strong></p>
+<p>提示：n是两个素数的乘积，且这两个素数非常接近。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">n = 0x9e1a6f7c8b3d5c9f0a4b6e7d8c1f4a3a2e5b6d7c8f9e0b1a0d2c3e4f5a6b7c8d </span><br><span class="line">e = 0x10001 </span><br><span class="line">c = 0x4f9db1fd3eb5aaedfbecbcbbdfbdcbaabecbdcbadfbecbdcbadfbecbdcbadfbe</span><br></pre></td></tr></table></figure>
+
+<p>可以利用yafu工具或者factordb网站来快速分解n，得到p和q：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p = 0xcf23df2207d99bf507846004ca03764d </span><br><span class="line">q = 0xcd5f28917ea79fe368deee31a73cd243</span><br></pre></td></tr></table></figure>
+
+<p>然后，我们可以利用gmpy2库来计算欧拉函数φ(n)、私钥d和明文m：</p>
+<p>给出一种解决方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"></span><br><span class="line">n = <span class="number">0x9e1a6f7c8b3d5c9f0a4b6e7d8c1f4a3a2e5b6d7c8f9e0b1a0d2c3e4f5a6b7c8d</span></span><br><span class="line">e = <span class="number">0x10001</span></span><br><span class="line">c = <span class="number">0x4f9db1fd3eb5aaedfbecbcbbdfbdcbaabecbdcbadfbecbdcbadfbecbdcbadfbe</span></span><br><span class="line"></span><br><span class="line">p = <span class="number">0xcf23df2207d99bf507846004ca03764d</span></span><br><span class="line">q = <span class="number">0xcd5f28917ea79fe368deee31a73cd243</span></span><br><span class="line"></span><br><span class="line">phi_n = (p-<span class="number">1</span>)*(q-<span class="number">1</span>) <span class="comment"># 欧拉函数φ(n)</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;phi_n =&quot;</span>, <span class="built_in">hex</span>(phi_n))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用gmpy2.invert(a,b)函数求逆元，即满足ax≡1(mod b)的整数x</span></span><br><span class="line"><span class="comment"># 如果不存在逆元，则返回零。</span></span><br><span class="line"><span class="comment"># 这里我们求私钥 d ≡ e^-1 (mod φ(n))</span></span><br><span class="line"><span class="comment"># 即满足 de ≡ 1 (mod φ(n)) 的整数 d</span></span><br><span class="line"><span class="comment"># 如果不存在私钥，则返回零。</span></span><br><span class="line"><span class="comment"># 这里我们假设存在私钥 d。</span></span><br><span class="line"></span><br><span class="line">d = gmpy2.invert(e, phi_n)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;d =&quot;</span>, <span class="built_in">hex</span>(d))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用gmpy2.powmod(a,b,c)函数求幂模运算，即计算 a^b mod c 的值</span></span><br><span class="line"><span class="comment"># 这里我们求明文 m ≡ c^d (mod n)</span></span><br><span class="line"></span><br><span class="line">m = gmpy2.powmod(c, d, n)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;m =&quot;</span>, <span class="built_in">hex</span>(m))</span><br></pre></td></tr></table></figure>
+
+<p>运行这段代码后，我们可以得到以下输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">phi_n = 0x9e1a6efdaaccccfdaaccccfdaaccccfdaaccccfdaaccccfdaaccccfdaaccccfc </span><br><span class="line">d = 0xd51af67573077be73077be73077be73077be73077be73077be73077be73077bd </span><br><span class="line">m = 0x666163746f72646220697320796f757220667269656e64 <span class="comment"># 明文的十六进制表示</span></span><br></pre></td></tr></table></figure>
+
+<p>最后，我们可以将明文的十六进制表示转换为ASCII字符串，得到最终答案：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"></span><br><span class="line">m_hex = <span class="string">&quot;666163746f72646220697320796f757220667269656e64&quot;</span></span><br><span class="line">m_ascii = binascii.unhexlify(m_hex).decode()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;m_ascii =&quot;</span>, m_ascii)</span><br></pre></td></tr></table></figure>
+
+<p>输出结果为：<code>m_ascii = factordb is your friend</code></p>
+<h3 id="RSA的共模攻击"><a href="#RSA的共模攻击" class="headerlink" title="RSA的共模攻击"></a>RSA的共模攻击</h3><p>RSA的共模攻击是一种利用两个或多个公钥（n，e）加密同一条信息m的方法，来破解RSA加密的攻击。如果两个公钥的模n相同，而指数e互质，那么就可以利用扩展欧几里德算法求出s1和s2，使得s1<em>e1+s2</em>e2&#x3D;1。然后根据以下公式求出m：</p>
+<p>m &#x3D; c1^s1 * c2^s2 mod n</p>
+<p>其中c1和c2是两个密文，分别是用（n，e1）和（n，e2）加密的。</p>
+<p>这种攻击要求拦截到两个或多个密文，并且知道对应的公钥。如果只有一个密文或者模n不同，则无法进行共模攻击。</p>
+<p><strong>题目：给定两个公钥和两个密文</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">n = 10509135007927020910961570498020654777820601579825669027410027026173076573380693204454238919762243178647774720169342528691085983225219960236799370268896666867164869238677749575679762611540687182614629847614275763451130215062534086871119259415866636857654106010518677919485438729877453549868724935457349692430637646827845074169704597756894678350214029352130966923159025112991395150214022844221949818486992653054085916326074567355928744181958934887632087019273037034539054980148783728604561167417571308543568511557184742388987903995431328908643666134429145944816840592528868078022503367301892068877343146684216682292031</span><br><span class="line">e1 = 2333</span><br><span class="line">c1 = 7817747253100075445080016685151086112268236401548478039383697586624131257005712900744875480257235019856465005133060251952853265167801711501859975585492982445693865641552507292652891995513965716569403068769379922648392091598433743576490830481993190692094310002540291082497060442504191087716491306341060343322555758506922102525722142895936303098845293736052077805416603114326241892440936798612985329887620848022507113494020806335634837064221561034485913416272720657761870572787579710754920585427628542146537468299211892356070884683021760416483687996756045071803827949139730328011630778732391114457251096093112357217218</span><br><span class="line">e2 = 23333</span><br><span class="line">c2 = 4005739533838233872100900192412804692746056018222370689494999429600683965220671145551011781360384072398973847079099863801781412654844344905559510784496389730242858693821886631397324132791823439680955157172958658051082121321917953586754734740594115385719917993135141183252010390389651513644552790616554115701338569755344442572426665297172781226400939991451728779259308086811204397695171302495091439788703682660000347393283282772216143916787270940246611837483151694679246528820414931162726657909701256510917389048934521382784300651451892299324944208983841733409704979351560563883697858790944929943311340614454947233485</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>给出一种解决方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"><span class="keyword">import</span> libnum</span><br><span class="line"></span><br><span class="line"><span class="comment"># 给定参数</span></span><br><span class="line">n = <span class="number">10509135007927020910961570498020654777820601579825669027410027026173076573380693204454238919762243178647774720169342528691085983225219960236799370268896666867164869238677749575679762611540687182614629847614275763451130215062534086871119259415866636857654106010518677919485438729877453549868724935457349692430637646827845074169704597756894678350214029352130966923159025112991395150214022844221949818486992653054085916326074567355928744181958934887632087019273037034539054980148783728604561167417571308543568511557184742388987903995431328908643666134429145944816840592528868078022503367301892068877343146684216682292031</span></span><br><span class="line">e1 = <span class="number">2333</span></span><br><span class="line">c1 = <span class="number">7817747253100075445080016685151086112268236401548478039383697586624131257005712900744875480257235019856465005133060251952853265167801711501859975585492982445693865641552507292652891995513965716569403068769379922648392091598433743576490830481993190692094310002540291082497060442504191087716491306341060343322555758506922102525722142895936303098845293736052077805416603114326241892440936798612985329887620848022507113494020806335634837064221561034485913416272720657761870572787579710754920585427628542146537468299211892356070884683021760416483687996756045071803827949139730328011630778732391114457251096093112357217218</span></span><br><span class="line">n2 = <span class="number">10509135007927020910961570498020654777820601579825669027410027026173076573380693204454238919762243178647774720169342528691085983225219960236799370268896666867164869238677749575679762611540687182614629847614275763451130215062534086871119259415866636857654106010518677919485438729877453549868724935457349692430637646827845074169704597756894678350214029352130966923159025112991395150214022844221949818486992653054085916326074567355928744181958934887632087019273037034539054980148783728604561167417571308543568511557184742388987903995431328908643666134429145944816840592528868078022503367301892068877343146684216682292031</span></span><br><span class="line">e2 = <span class="number">23333</span></span><br><span class="line">c2 = <span class="number">4005739533838233872100900192412804692746056018222370689494999429600683965220671145551011781360384072398973847079099863801781412654844344905559510784496389730242858693821886631397324132791823439680955157172958658051082121321917953586754734740594115385719917993135141183252010390389651513644552790616554115701338569755344442572426665297172781226400939991451728779259308086811204397695171302495091439788703682660000347393283282772216143916787270940246611837483151694679246528820414931162726657909701256510917389048934521382784300651451892299324944208983841733409704979351560563883697858790944929943311340614454947233485</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 共模攻击</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">rsa_common_N</span>(<span class="params">e1, e2, c1, c2, n</span>):</span><br><span class="line">    e1, e2, c1, c2, n = <span class="built_in">int</span>(e1), <span class="built_in">int</span>(e2), <span class="built_in">int</span>(c1), <span class="built_in">int</span>(c2), <span class="built_in">int</span>(n)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;e1,e2:&quot;</span>, e1, e2)</span><br><span class="line">    <span class="built_in">print</span>(gmpy2.gcd(e1, e2))</span><br><span class="line">    <span class="keyword">if</span> gmpy2.gcd(e1, e2):</span><br><span class="line">        s = gmpy2.gcdext(e1, e2)</span><br><span class="line">        s1 = s[<span class="number">1</span>]</span><br><span class="line">        s2 = s[<span class="number">2</span>]</span><br><span class="line">        <span class="keyword">if</span> s1 &lt; <span class="number">0</span>:</span><br><span class="line">            s1 = - s1</span><br><span class="line">            c1 = gmpy2.invert(c1, n)</span><br><span class="line">        <span class="keyword">elif</span> s2 &lt; <span class="number">0</span>:</span><br><span class="line">            s2 = - s2</span><br><span class="line">            c2 = gmpy2.invert(c2, n)</span><br><span class="line">        m = (<span class="built_in">pow</span>(c1, s1, n) * <span class="built_in">pow</span>(c2, s2, n)) % n</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">int</span>(m)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;e1,e2不互质&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">m = rsa_common_N(e1, e2, c1, c2, n)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(libnum.n2s(<span class="built_in">int</span>(m)).decode())</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>运行代码后得到：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flag&#123;6ed4c74e022cb18c8039e96de93aa9ce&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="RSA小指数e攻击"><a href="#RSA小指数e攻击" class="headerlink" title="RSA小指数e攻击"></a>RSA小指数e攻击</h3><p>利用了公钥指数e选取不当的弱点。如果e很小，比如2或3，那么加密后的密文c可能会比模数n小很多，这样就可以直接对c开根号得到明文m。</p>
+<p>或者如果有多个不同的n和相同的e，那么可以利用中国剩余定理和格基约化算法来求解低次多项式的小根。</p>
+<p>为了防止这种攻击，一般建议使用较大的e，比如65537⁴⁵。这样既可以提高加密速度，又可以避免低指数攻击。</p>
+<p>例如，假设有一个RSA加密系统，其中公钥指数e&#x3D;3，模数n&#x3D;55，明文m&#x3D;2。那么加密后的密文c&#x3D;m^e mod n &#x3D; 2^3 mod 55 &#x3D; 8。由于c比n小很多，我们可以直接对c开三次方根得到m&#x3D;c^(1&#x2F;3) &#x3D; 8^(1&#x2F;3) &#x3D; 2。</p>
+<h3 id="低加密指数攻击"><a href="#低加密指数攻击" class="headerlink" title="低加密指数攻击"></a>低加密指数攻击</h3><p>低加密指数攻击是一种针对RSA加密算法的攻击方式，利用了当公钥指数e很小的时候，密文c可能比模数n小很多，从而可以直接对c开e次方根得到明文m。例如，如果e&#x3D;3，n&#x3D;55，m&#x3D;2，那么c&#x3D;m^e mod n &#x3D; 8。由于c&lt;n，我们可以直接计算m&#x3D;c^(1&#x2F;3) &#x3D; 2²。</p>
+<h3 id="低加密指数广播攻击"><a href="#低加密指数广播攻击" class="headerlink" title="低加密指数广播攻击"></a>低加密指数广播攻击</h3><p>低加密指数广播攻击是一种更复杂的情况，当同一个明文m被多个不同的n和相同的e加密时，攻击者可以利用中国剩余定理来恢复m。例如，如果e&#x3D;3，n1&#x3D;55,n2&#x3D;77,n3&#x3D;91,m&#x3D;42，那么c1&#x3D;m^e mod n1 &#x3D; 27,c2&#x3D;m^e mod n2 &#x3D; 13,c3&#x3D;m^e mod n3 &#x3D; 6。由于n1,n2,n3互质，我们可以利用中国剩余定理求出一个x满足x&#x3D;c1 mod n1,x&#x3D;c2 mod n2,x&#x3D;c3 mod n3。这个x就是m^e mod (n1 * n2 * n3)，而由于m &lt; min(n1,n2,n3)，我们有x&lt; m^e &lt;(min(n1,n2,n3))^e &lt; (n1 * n2 *n3)。因此我们可以直接计算m&#x3D;x^(1&#x2F;3)。</p>
+<h3 id="低解密指数攻击"><a href="#低解密指数攻击" class="headerlink" title="低解密指数攻击"></a>低解密指数攻击</h3><p>低解密指数攻击是一种针对RSA加密算法的攻击方式，利用了当私钥指数d很小的时候，可以通过寻找低次多项式的小解来恢复d。例如，如果e&#x3D;2^1024+1 ，n&#x3D;55，m&#x3D;2，那么c&#x3D;m^e mod n &#x3D; 8。由于e很大，我们可以假设d也很小，并且满足ed&#x3D;kφ(n)+1。因此我们可以构造一个多项式f(x)&#x3D;x^(kφ(n)+1)-c ，并寻找它的一个小整数根x0。如果找到了这样的根，那么我们就有x0^(kφ(n)+1)&#x3D;c mod n，即x0^e&#x3D;c mod n。由于RSA的正确性，我们有x0&#x3D;m mod n。因此我们可以计算出m。</p>
+<h3 id="维纳攻击"><a href="#维纳攻击" class="headerlink" title="维纳攻击"></a>维纳攻击</h3><p>RSA的维纳攻击是一种利用连分数来求解RSA公钥中的私钥指数d的方法。它基于一个假设，即d比N的四分之一次方小很多。如果满足这个条件，那么可以通过计算e和N的连分数展开，得到一系列近似值k&#x2F;d，并尝试用它们还原出p和q。</p>
+<p>维纳攻击法是由Michael J. Wiener在1990年提出的，他证明了如果d小于N^(1&#x2F;4)&#x2F;3，则该方法可以成功。后来有人对这个方法进行了扩展，使得在多个解密指数d存在时也能有效。</p>
+<p>例如，<strong>这是一个来自CTF Wiki的题目</strong>：</p>
+<p>给出RSA公钥和密文：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">N = <span class="number">0x180be86dc898a3c3a710e52b31de460f8f350610bf63e6b2203c08fddad44601dbbb4d2cc0d9eaaf9d20a7f819f5e94c54ca7248ef24fc8a838360eeb92985c1b9547ed5b0ee704adf2eb1d6af4a28eacc38e96127ecd1dcb40614ed57310ce9</span></span><br><span class="line">e = <span class="number">0x1</span></span><br><span class="line">c = <span class="number">0x4963654354467b5769696e6572735f41747461636b5f69735f556e636f6d6d6f6e5f6275745f6578697374737d</span></span><br></pre></td></tr></table></figure>
+
+<p>求明文。</p>
+<p>解题思路：</p>
+<p>由于公钥指数e为1，说明私钥指数d也为1，即ed &#x3D; 1 mod phi(N)。这样就满足了维纳攻击的条件，可以使用连分数方法来求解d。</p>
+<p>我们可以使用<a target="_blank" rel="noopener" href="https://github.com/RsaCtfTool/RsaCtfTool">RsaCtfTool</a>来进行维纳攻击，只需要将公钥和密文保存为文件，并运行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python RsaCtfTool.py -n N -e e --uncipher c --attack wiener</span><br></pre></td></tr></table></figure>
+
+<p>其中N, e, c分别是公钥模数、指数和密文的十六进制表示。</p>
+<p>运行后得到输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">private argument is not <span class="built_in">set</span>, the private key will not be displayed, even <span class="keyword">if</span> recovered.</span><br><span class="line"></span><br><span class="line">[*] Testing key /tmp/tmpvzqjwzgk.</span><br><span class="line">[*] Performing wiener attack on /tmp/tmpvzqjwzgk.</span><br><span class="line"></span><br><span class="line">Results <span class="keyword">for</span> /tmp/tmpvzqjwzgk:</span><br><span class="line"></span><br><span class="line">Unciphered data :</span><br><span class="line">HEX : 0x004963654354467b5769696e6572735f41747461636b5f69735f556e636f6d6d6f6e5f6275745f6578697374737d</span><br><span class="line">INT (big endian) : 96714065569170333976494232</span><br><span class="line">INT (little endian) : 10856837384550951900160000</span><br><span class="line">STR : b<span class="string">&#x27;\x00IceCTF&#123;Wieners_Attack_is_Uncommon_but_exists&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，明文就是<code>IceCTF&#123;Wieners_Attack_is_Uncommon_but_exists&#125;</code>。</p>
+<p>如果不使用RsaCtfTool，可以采用以下python代码：</p>
+<p>需要用到sympy库来进行大数运算和求解方程，以及gmpy2库来进行连分数计算。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"><span class="keyword">from</span> sympy <span class="keyword">import</span> nextprime</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成公钥和私钥</span></span><br><span class="line">p = nextprime(<span class="number">2</span>**<span class="number">512</span>)</span><br><span class="line">q = nextprime(p)</span><br><span class="line">N = p * q</span><br><span class="line">phi = (p-<span class="number">1</span>) * (q-<span class="number">1</span>)</span><br><span class="line">e = <span class="number">1</span></span><br><span class="line">d = gmpy2.invert(e, phi)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加密明文</span></span><br><span class="line">m = <span class="built_in">int</span>.from_bytes(<span class="string">b&quot;IceCTF&#123;Wieners_Attack_is_Uncommon_but_exists&#125;&quot;</span>, <span class="string">&quot;big&quot;</span>)</span><br><span class="line">c = <span class="built_in">pow</span>(m, e, N)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 维纳攻击</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">wiener_attack</span>(<span class="params">e, N</span>):</span><br><span class="line">    <span class="comment"># 计算e/N的连分数展开</span></span><br><span class="line">    cf_expansion = <span class="built_in">list</span>(gmpy2.continued_fraction(e, N))</span><br><span class="line">    <span class="comment"># 计算连分数的收敛值，即k/d的近似值</span></span><br><span class="line">    convergents = <span class="built_in">list</span>(gmpy2.convergents(cf_expansion))</span><br><span class="line">    <span class="keyword">for</span> k,d <span class="keyword">in</span> convergents:</span><br><span class="line">        <span class="comment"># 如果d为0或者ed不为1模phi(N)，则跳过</span></span><br><span class="line">        <span class="keyword">if</span> d == <span class="number">0</span> <span class="keyword">or</span> (e*d-<span class="number">1</span>) % N == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="comment"># 尝试求解phi(N)</span></span><br><span class="line">        phi = (e*d-<span class="number">1</span>)//N</span><br><span class="line">        <span class="comment"># 根据phi(N)和N求解p和q，即解出一元二次方程x^2-(N-phi(N)+1)x+N=0的根</span></span><br><span class="line">        s = N - phi + <span class="number">1</span> </span><br><span class="line">        D = s*s - <span class="number">4</span>*N </span><br><span class="line">        <span class="keyword">if</span> D &gt;= <span class="number">0</span>: </span><br><span class="line">            t = gmpy2.isqrt(D) </span><br><span class="line">            <span class="keyword">if</span> t*t == D <span class="keyword">and</span> s+t &gt; <span class="number">0</span>: </span><br><span class="line">                <span class="keyword">return</span> d</span><br><span class="line"></span><br><span class="line"><span class="comment"># 求解私钥指数d并解密密文</span></span><br><span class="line">d_found = wiener_attack(e, N)</span><br><span class="line"><span class="keyword">if</span> d_found:</span><br><span class="line">    m_found = <span class="built_in">pow</span>(c, d_found, N)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Found d:&quot;</span>, d_found)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Decrypted message:&quot;</span>, m_found.to_bytes((m_found.bit_length()+<span class="number">7</span>)//<span class="number">8</span>, <span class="string">&quot;big&quot;</span>))</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Failed to find d&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>运行后得到输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Found d: 1</span><br><span class="line">Decrypted message: b<span class="string">&#x27;IceCTF&#123;Wieners_Attack_is_Uncommon_but_exists&#125;&#x27;</span></span><br></pre></td></tr></table></figure></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="nwpuhkp">NWPUHKP</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://nwpuhkp.github.io/2023/04/03/RSA/">http://nwpuhkp.github.io/2023/04/03/RSA/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://nwpuhkp.github.io" target="_blank">The Blog of NWPUHKP</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8/">安全</a><a class="post-meta__tags" href="/tags/%E5%AF%86%E7%A0%81%E5%AD%A6/">密码学</a><a class="post-meta__tags" href="/tags/%E5%85%AC%E9%92%A5%E5%AF%86%E7%A0%81/">公钥密码</a><a class="post-meta__tags" href="/tags/RSA/">RSA</a></div><div class="post_share"><div class="social-share" data-image="https://www.z4a.net/images/2023/04/08/into.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img class="cover" src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">论文阅读-Live Trojan Attacks on Deep Neural Networks</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img class="cover" src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">论文阅读-Live Trojan Attacks on Deep Neural Networks</div></div></a></div><div><a href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img class="cover" src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-14</div><div class="title">论文阅读-Fuzzing of Embedded Systems A Survey</div></div></a></div><div><a href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img class="cover" src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-05</div><div class="title">ROP初探之ret2text</div></div></a></div><div><a href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img class="cover" src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-06</div><div class="title">ROP初探之ret2shellcode</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NWPUHKP</div><div class="author-info__description">且视他人之疑目如盏盏鬼火，大胆地去走你的夜路</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/nwpuhkp"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/nwpuhkp" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:kepuhuang@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://space.bilibili.com/57507739" target="_blank" title="Bilibili"><i class="fab fa-bilibili"></i></a><a class="social-icon" href="https://weibo.com/u/6035177688" target="_blank" title="Weibo"><i class="fab fa-weibo"></i></a><a class="social-icon" href="https://s1.ax1x.com/2023/04/02/ppf2g2T.jpg" target="_blank" title="Wechat"><i class="fab fa-weixin"></i></a><a class="social-icon" href="https://twitter.com/huangkepu" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#RSA%E5%85%AC%E9%92%A5%E5%AF%86%E7%A0%81%E6%80%BB%E7%BB%93"><span class="toc-number">1.</span> <span class="toc-text">RSA公钥密码总结</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#RSA%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B"><span class="toc-number">1.1.</span> <span class="toc-text">RSA基本流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RSA%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90"><span class="toc-number">1.2.</span> <span class="toc-text">RSA安全性分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#RSA%E5%AE%89%E5%85%A8%E6%80%A7%E7%9A%84%E8%A6%81%E6%B1%82"><span class="toc-number">1.2.1.</span> <span class="toc-text">RSA安全性的要求</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E6%94%BB%E5%87%BB%E6%96%B9%E6%B3%95"><span class="toc-number">1.3.</span> <span class="toc-text">常用的攻击方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E5%88%86%E8%A7%A3%E6%A8%A1%E6%95%B0N"><span class="toc-number">1.3.1.</span> <span class="toc-text">直接分解模数Ｎ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RSA%E7%9A%84%E5%85%B1%E6%A8%A1%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.2.</span> <span class="toc-text">RSA的共模攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RSA%E5%B0%8F%E6%8C%87%E6%95%B0e%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.3.</span> <span class="toc-text">RSA小指数e攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8E%E5%8A%A0%E5%AF%86%E6%8C%87%E6%95%B0%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.4.</span> <span class="toc-text">低加密指数攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8E%E5%8A%A0%E5%AF%86%E6%8C%87%E6%95%B0%E5%B9%BF%E6%92%AD%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.5.</span> <span class="toc-text">低加密指数广播攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8E%E8%A7%A3%E5%AF%86%E6%8C%87%E6%95%B0%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.6.</span> <span class="toc-text">低解密指数攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%B4%E7%BA%B3%E6%94%BB%E5%87%BB"><span class="toc-number">1.3.7.</span> <span class="toc-text">维纳攻击</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Fuzzing of Embedded Systems A Survey"/></a><div class="content"><a class="title" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey">论文阅读-Fuzzing of Embedded Systems A Survey</a><time datetime="2023-06-14T08:54:36.000Z" title="发表于 2023-06-14 16:54:36">2023-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2shellcode"/></a><div class="content"><a class="title" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode">ROP初探之ret2shellcode</a><time datetime="2023-05-06T12:20:36.000Z" title="发表于 2023-05-06 20:20:36">2023-05-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2text"/></a><div class="content"><a class="title" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text">ROP初探之ret2text</a><time datetime="2023-05-05T10:58:16.000Z" title="发表于 2023-05-05 18:58:16">2023-05-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/08/learnofpth/" title="深入理解Pytorch中模型保存文件pth"><img src="https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="深入理解Pytorch中模型保存文件pth"/></a><div class="content"><a class="title" href="/2023/04/08/learnofpth/" title="深入理解Pytorch中模型保存文件pth">深入理解Pytorch中模型保存文件pth</a><time datetime="2023-04-08T01:29:43.000Z" title="发表于 2023-04-08 09:29:43">2023-04-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Live Trojan Attacks on Deep Neural Networks"/></a><div class="content"><a class="title" href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks">论文阅读-Live Trojan Attacks on Deep Neural Networks</a><time datetime="2023-04-03T06:27:54.000Z" title="发表于 2023-04-03 14:27:54">2023-04-03</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://www.z4a.net/images/2023/04/08/into.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2023 By NWPUHKP</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a>&nbsp;<a target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a>&nbsp;<a target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a>&nbsp;<a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a>&nbsp;<a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/"><span>备案号：陕ICP备2022011597号-1</span></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

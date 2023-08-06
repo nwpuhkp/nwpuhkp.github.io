@@ -1,0 +1,256 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>深入理解Pytorch中模型保存文件pth | The Blog of NWPUHKP</title><meta name="author" content="NWPUHKP"><meta name="copyright" content="NWPUHKP"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一、Pytorch中模型保存和加载方法本文在介绍Pytorch中模型保存文件pth之前，将先探讨如模型的保存&#x2F;加载的方法。三个核心函数：  torch.save：把序列化的对象保存到硬盘。利用Python的pickle来实现序列化。模型、tensor以及字典都可以用该函数进行保存； torch.load：采用 pickle 将反序列化的对象从存储中加载进来。 torch.nn.Modul">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解Pytorch中模型保存文件pth">
+<meta property="og:url" content="http://nwpuhkp.github.io/2023/04/08/learnofpth/index.html">
+<meta property="og:site_name" content="The Blog of NWPUHKP">
+<meta property="og:description" content="一、Pytorch中模型保存和加载方法本文在介绍Pytorch中模型保存文件pth之前，将先探讨如模型的保存&#x2F;加载的方法。三个核心函数：  torch.save：把序列化的对象保存到硬盘。利用Python的pickle来实现序列化。模型、tensor以及字典都可以用该函数进行保存； torch.load：采用 pickle 将反序列化的对象从存储中加载进来。 torch.nn.Modul">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg">
+<meta property="article:published_time" content="2023-04-08T01:29:43.000Z">
+<meta property="article:modified_time" content="2023-04-25T03:03:38.981Z">
+<meta property="article:author" content="NWPUHKP">
+<meta property="article:tag" content="Pytorch">
+<meta property="article:tag" content="AI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://nwpuhkp.github.io/2023/04/08/learnofpth/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: {"limitDay":500,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":80,"languages":{"author":"作者: NWPUHKP","link":"链接: ","source":"来源: The Blog of NWPUHKP","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '深入理解Pytorch中模型保存文件pth',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-25 11:03:38'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="The Blog of NWPUHKP"><span class="site-name">The Blog of NWPUHKP</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">深入理解Pytorch中模型保存文件pth</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-08T01:29:43.000Z" title="发表于 2023-04-08 09:29:43">2023-04-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-04-25T03:03:38.981Z" title="更新于 2023-04-25 11:03:38">2023-04-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/">人工智能</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/Pytorch/">Pytorch</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>10分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="深入理解Pytorch中模型保存文件pth"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="一、Pytorch中模型保存和加载方法"><a href="#一、Pytorch中模型保存和加载方法" class="headerlink" title="一、Pytorch中模型保存和加载方法"></a>一、Pytorch中模型保存和加载方法</h1><p>本文在介绍Pytorch中模型保存文件pth之前，将先探讨如模型的保存&#x2F;加载的方法。<br>三个核心函数：</p>
+<ul>
+<li><strong>torch.save</strong>：把序列化的对象保存到硬盘。利用Python的pickle来实现序列化。模型、tensor以及字典都可以用该函数进行保存；</li>
+<li><strong>torch.load</strong>：采用 pickle 将反序列化的对象从存储中加载进来。</li>
+<li><strong>torch.nn.Module.load_state_dict</strong>：采用一个反序列化的state_dict加载一个模型的参数字典。</li>
+</ul>
+<h2 id="保存-x2F-加载模型"><a href="#保存-x2F-加载模型" class="headerlink" title="保存&#x2F;加载模型"></a>保存&#x2F;加载模型</h2><p>在Pytorch中，模型的保存和加载主要有两种方法，一种是保存&#x2F;加载<strong>整个模型</strong>，另一种是只保存&#x2F;加载<strong>模型参数</strong>。</p>
+<h3 id="1-保存整个模型"><a href="#1-保存整个模型" class="headerlink" title="1. 保存整个模型"></a>1. 保存整个模型</h3><p>这种方法保存和加载模型都是采用最简单的语法。这种方法将是采用Python的pickle模块来保存整个模型，它的缺点就是序列化后的数据是属于特定的类和指定的字典结构，原因就是pickle并没有保存模型类别，而是保存一个包含该类的文件路径，因此，当在其他项目或者在 refactors 后采用都可能出现错误。</p>
+<p>示例方法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 保存整个模型</span></span><br><span class="line">torch.save(model, PATH)</span><br><span class="line"><span class="comment"># 加载整个模型</span></span><br><span class="line">model = torch.load(PATH)</span><br><span class="line">model.<span class="built_in">eval</span>()</span><br></pre></td></tr></table></figure>
+<p>造成的影响：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"></span><br><span class="line">pthfile = <span class="string">r&#x27;your_path/model.pth&#x27;</span> </span><br><span class="line">net = torch.load(pthfile, map_location=torch.device(<span class="string">&#x27;cpu&#x27;</span>)) <span class="comment"># 加载模型</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">type</span>(net)) <span class="comment"># 类型是 dict</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(net)) <span class="comment"># 长度为 4，即存在四个 key-value 键值对</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> net.keys():</span><br><span class="line"><span class="built_in">print</span>(k) <span class="comment"># 查看四个键，分别是 model,optimizer,scheduler,iteration</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://www.z4a.net/images/2023/04/08/save_all_model.png#pic_center" alt="save_all_model.png"><br>如上图所示，保存的完整模型是一个字典，包含了模型、优化器、学习率调整器、迭代次数等信息。这种方法的缺点是，如果要加载模型，必须要保证模型的类别和结构不变，否则会报错。<br>例如，如果加载了之前的模型，但是想修改学习率之类的参数，由于加载的模型中保存了optimizer和scheduler，所以再次加载此文件时会使用之前的学习率。如果想要修改参数，其实只需要将模型权重加载进来就可以了，不需要再加载optimizer和scheduler。<br>如下面的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"> </span><br><span class="line">net = torch.load(<span class="string">&#x27;your_path/model.pth&#x27;</span>)</span><br><span class="line"> </span><br><span class="line">new = &#123;<span class="string">&quot;model&quot;</span>: net[<span class="string">&quot;model&quot;</span>]&#125; <span class="comment"># 只保存模型的参数</span></span><br><span class="line">torch.save(new, <span class="string">&#x27;your_new_path/model.pth&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>或者在保存模型时，只保存模型的参数，如后面1.2节所示。</p>
+<h3 id="2-仅保存模型参数（官方推荐）"><a href="#2-仅保存模型参数（官方推荐）" class="headerlink" title="2. 仅保存模型参数（官方推荐）"></a>2. 仅保存模型参数（官方推荐）</h3><p>当需要为预测保存一个模型的时候，只需要保存训练模型的可学习参数即可。<br>示例代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">torch.save(model.state_dict(), PATH) <span class="comment"># 保存模型参数</span></span><br><span class="line"></span><br><span class="line">model = TheModelClass(*args, **kwargs) <span class="comment"># 重新初始化模型</span></span><br><span class="line">model.load_state_dict(torch.load(PATH)) <span class="comment"># 加载模型参数</span></span><br><span class="line">model.<span class="built_in">eval</span>() <span class="comment"># 设置为评估模式</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>其中，<strong>model.state_dict()</strong> 返回一个字典，包含了模型的可学习参数，如卷积层的权重和偏置等。<strong>model.load_state_dict()</strong> 将保存的参数加载到模型中。</li>
+<li>而<strong>load_state_dict()</strong> 方法必须传入一个字典对象，而不是对象的保存路径，也就是说必须先反序列化字典对象，然后再调用该方法，也是例子中先采用 <strong>torch.load()</strong> ，而不是直接**model.load_state_dict(PATH)**。</li>
+</ul>
+<p>例如，若采取以下的网络结构：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">DQN</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_channels=<span class="number">4</span>, n_actions=<span class="number">14</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(DQN, self).__init__()</span><br><span class="line">        self.conv1 = nn.Conv2d(in_channels, <span class="number">32</span>, kernel_size=<span class="number">8</span>, stride=<span class="number">4</span>) <span class="comment"># 4*84*84 -&gt; 32*20*20</span></span><br><span class="line">        self.conv2 = nn.Conv2d(<span class="number">32</span>, <span class="number">64</span>, kernel_size=<span class="number">4</span>, stride=<span class="number">2</span>) <span class="comment"># 32*20*20 -&gt; 64*9*9</span></span><br><span class="line">        self.conv3 = nn.Conv2d(<span class="number">64</span>, <span class="number">64</span>, kernel_size=<span class="number">3</span>, stride=<span class="number">1</span>) <span class="comment"># 64*9*9 -&gt; 64*7*7</span></span><br><span class="line">        self.fc4 = nn.Linear(<span class="number">7</span> * <span class="number">7</span> * <span class="number">64</span>, <span class="number">512</span>) <span class="comment"># 64*7*7 -&gt; 512</span></span><br><span class="line">        self.head = nn.Linear(<span class="number">512</span>, n_actions) <span class="comment"># 512 -&gt; 14</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = x.<span class="built_in">float</span>() / <span class="number">255</span> <span class="comment"># 归一化</span></span><br><span class="line">        x = F.relu(self.conv1(x)) <span class="comment"># 激活函数</span></span><br><span class="line">        x = F.relu(self.conv2(x)) <span class="comment"># 激活函数</span></span><br><span class="line">        x = F.relu(self.conv3(x)) <span class="comment"># 激活函数</span></span><br><span class="line">        x = F.relu(self.fc4(x.view(x.size(<span class="number">0</span>), -<span class="number">1</span>))) <span class="comment"># 激活函数</span></span><br><span class="line">        <span class="keyword">return</span> self.head(x) <span class="comment"># 输出</span></span><br></pre></td></tr></table></figure>
+<p>保存模型参数的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 保存模型参数</span></span><br><span class="line">torch.save(model.state_dict(), <span class="string">&#x27;your_path/model.pth&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>加载模型参数的代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 加载模型参数</span></span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"></span><br><span class="line">pthfile = <span class="string">r&#x27;your_path/model.pth&#x27;</span></span><br><span class="line">net = torch.load(pthfile, map_location=torch.device(<span class="string">&#x27;cpu&#x27;</span>))</span><br><span class="line"><span class="comment"># 打印网络结构</span></span><br><span class="line"><span class="built_in">print</span>(net) </span><br><span class="line"><span class="comment"># 打印网络的类型</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">type</span>(net)) <span class="comment"># 类型是 OrderedDict &lt;class &#x27;collections.OrderedDict&#x27;&gt;</span></span><br><span class="line"><span class="comment"># 打印网络参数的键值对</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(net)) <span class="comment"># 长度为 10，即存在十个 key-value 键值对</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://www.z4a.net/images/2023/04/08/net_weight_bias.png#pic_center" alt="net_weight_bias.png"><br>如上图所示，保存的模型参数是一个字典，包含了模型的可学习参数，如卷积层的权重和偏置等。</p>
+<h1 id="二、权重和偏置"><a href="#二、权重和偏置" class="headerlink" title="二、权重和偏置"></a>二、权重和偏置</h1><p><img src="https://www.z4a.net/images/2023/04/08/function-nn.png#pic_center" alt="function-nn.png"><br>如上图所示，神经网络的权重和偏置是模型的可学习参数，是模型的核心，也是模型的灵魂。在训练模型时，权重和偏置是不断变化的，而在预测时，权重和偏置是固定的。<br>其中：</p>
+<ul>
+<li>输入层各节点中，<strong>要素x、权重w和偏执b为输入</strong>，z为输出。</li>
+<li>weight、bais一般是从高斯分布中随机初始化的值。</li>
+<li>权重表示可能性大小，偏置用于正确分类样本，保证输出值不能被随便激活。<br>计算出z后，对z使用激活函数σ。</li>
+<li>激活函数用于向模型引入一些非线性，可以将神经元的输出幅度限制在一定范围，一般为（-1，1）、（0，1）。</li>
+<li>常用的激活函数有sigmoid、tanh、ReLU。</li>
+</ul>
+<p>整个过程为：首先前向传播（对变量和权重进行计算，最后求出误差）；然后反向传播（遍历每个层每个连接对误差的贡献，然后调整权重和偏置）。<br>一般来说，<strong>全连接层和卷积层都会有权重和偏置</strong>，但是池化层，激活层，归一化层等就不一定需要权重和偏置。这些层的作用是对输入进行非线性变换，降采样，规范化等操作，不涉及参数的学习。</p>
+<h1 id="三、模型参数的二进制分析"><a href="#三、模型参数的二进制分析" class="headerlink" title="三、模型参数的二进制分析"></a>三、模型参数的二进制分析</h1><h2 id="1-torch-save-底层函数分析"><a href="#1-torch-save-底层函数分析" class="headerlink" title="1. torch.save() 底层函数分析"></a>1. torch.save() 底层函数分析</h2><p>官方给出的函数作用解释：将序列化对象保存到磁盘。此函数使用Python的pickle实用程序进行序列化。使用此函数可以保存各种对象的模型、张量和字典。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">save</span>(<span class="params"></span></span><br><span class="line"><span class="params">    obj: <span class="built_in">object</span>,</span></span><br><span class="line"><span class="params">    f: FILE_LIKE,</span></span><br><span class="line"><span class="params">    pickle_module: <span class="type">Any</span> = pickle,</span></span><br><span class="line"><span class="params">    pickle_protocol: <span class="built_in">int</span> = DEFAULT_PROTOCOL,</span></span><br><span class="line"><span class="params">    _use_new_zipfile_serialization: <span class="built_in">bool</span> = <span class="literal">True</span></span></span><br><span class="line"><span class="params"></span>) -&gt; <span class="literal">None</span>:</span><br><span class="line">    <span class="comment"># Reference: https://github.com/pytorch/pytorch/issues/54354</span></span><br><span class="line">    <span class="comment"># The first line of this docstring overrides the one Sphinx generates for the</span></span><br><span class="line">    <span class="comment"># documentation. We need it so that Sphinx doesn&#x27;t leak `pickle`s path from</span></span><br><span class="line">    <span class="comment"># the build environment (e.g. `&lt;module &#x27;pickle&#x27; from &#x27;/leaked/path&#x27;).</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&quot;&quot;&quot;save(obj, f, pickle_module=pickle, pickle_protocol=DEFAULT_PROTOCOL, _use_new_zipfile_serialization=True)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Saves an object to a disk file.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    See also: :ref:`saving-loading-tensors`</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        obj: saved object</span></span><br><span class="line"><span class="string">        f: a file-like object (has to implement write and flush) or a string or</span></span><br><span class="line"><span class="string">           os.PathLike object containing a file name</span></span><br><span class="line"><span class="string">        pickle_module: module used for pickling metadata and objects</span></span><br><span class="line"><span class="string">        pickle_protocol: can be specified to override the default protocol</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    .. note::</span></span><br><span class="line"><span class="string">        A common PyTorch convention is to save tensors using .pt file extension.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    .. note::</span></span><br><span class="line"><span class="string">        PyTorch preserves storage sharing across serialization. See</span></span><br><span class="line"><span class="string">        :ref:`preserve-storage-sharing` for more details.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    .. note::</span></span><br><span class="line"><span class="string">        The 1.6 release of PyTorch switched ``torch.save`` to use a new</span></span><br><span class="line"><span class="string">        zipfile-based file format. ``torch.load`` still retains the ability to</span></span><br><span class="line"><span class="string">        load files in the old format. If for any reason you want ``torch.save``</span></span><br><span class="line"><span class="string">        to use the old format, pass the kwarg ``_use_new_zipfile_serialization=False``.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Example:</span></span><br><span class="line"><span class="string">        &gt;&gt;&gt; # xdoctest: +SKIP(&quot;makes cwd dirty&quot;)</span></span><br><span class="line"><span class="string">        &gt;&gt;&gt; # Save to file</span></span><br><span class="line"><span class="string">        &gt;&gt;&gt; x = torch.tensor([0, 1, 2, 3, 4])</span></span><br><span class="line"><span class="string">        &gt;&gt;&gt; torch.save(x, &#x27;tensor.pt&#x27;)</span></span><br><span class="line"><span class="string">        &gt;&gt;&gt; # Save to io.BytesIO buffer</span></span><br><span class="line"><span class="string">        &gt;&gt;&gt; buffer = io.BytesIO()</span></span><br><span class="line"><span class="string">        &gt;&gt;&gt; torch.save(x, buffer)</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    torch._C._log_api_usage_once(<span class="string">&quot;torch.save&quot;</span>)</span><br><span class="line">    _check_dill_version(pickle_module)</span><br><span class="line">    _check_save_filelike(f)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> _use_new_zipfile_serialization:</span><br><span class="line">        <span class="keyword">with</span> _open_zipfile_writer(f) <span class="keyword">as</span> opened_zipfile:</span><br><span class="line">            _save(obj, opened_zipfile, pickle_module, pickle_protocol)</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">with</span> _open_file_like(f, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> opened_file:</span><br><span class="line">            _legacy_save(obj, opened_file, pickle_module, pickle_protocol)</span><br></pre></td></tr></table></figure>
+<p>官方note：“请注意，load_state_dict()函数接受字典对象，而不是保存对象的路径。这意味着，在将其传递给load_state_dict()函数之前，您必须对保存的state_dict进行反序列化。例如，您不能使用model.load_state_dict(PATH)加载。”</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">torch.save(obj, f, pickle_module=pickle, pickle_protocol=DEFAULT_PROTOCOL,_use_new_zipfile_serialization=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+<p>参数：</p>
+<ul>
+<li>obj：保存的对象</li>
+<li>f：文件对象（必须实现write和flush方法）或字符串或os.PathLike对象，包含文件名</li>
+<li>pickle_module：用于序列化元数据和对象的模块</li>
+<li>pickle_protocol：可以指定以覆盖默认协议</li>
+</ul>
+<p><strong>也就是在save和load之间，需要进行序列化和反序列化的操作。</strong></p>
+<h2 id="2-pickle-序列化和反序列化"><a href="#2-pickle-序列化和反序列化" class="headerlink" title="2.pickle 序列化和反序列化"></a>2.pickle 序列化和反序列化</h2><p>因此必须提到pickle这样一个序列化模块，pickle模块实现了基本的数据序列和反序列化。通过pickle模块的序列化操作我们能够将程序中运行的对象信息保存到文件中去，永久存储；通过pickle模块的反序列化操作，我们能够从文件中创建上一次程序保存的对象。</p>
+<p>pickle的源代码文件可见<a target="_blank" rel="noopener" href="https://github.com/python/cpython/tree/3.11/Lib/pickle.py">Lib&#x2F;pickle.py</a><br>pickle的使用方法可见<a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/pickle.html">官方文档</a></p>
+<p>简而言之，Pytorch保存整个module使用的是pickle库，由于这个库在保存类的时候，并不是保存类本身，而是只保存了类名和类定义的位置，在加载的时候，pickle库会找类定义的位置，去加载类的定义。这就导致了在保存和加载的时候，如果类的定义发生了变化，就会出现找不到类的定义的错误。</p>
+<p>可以被序列化&#x2F;反序列化的对象</p>
+<p>下列类型可以被封存：</p>
+<ul>
+<li>None、True 和 False</li>
+<li>整数、浮点数、复数</li>
+<li>str、byte、bytearray</li>
+<li>只包含可封存对象的集合，包括 tuple、list、set 和 dict</li>
+<li>定义在模块最外层的函数（使用 def 定义，lambda 函数则不可以）</li>
+<li>定义在模块最外层的内置函数</li>
+<li>定义在模块最外层的类</li>
+<li>某些类实例，这些类的 <strong>dict</strong> 属性值或 <strong>getstate</strong>() 函数的返回值可以被封存（详情参阅 封存类实例 这一段）。</li>
+</ul>
+<p>尝试封存不能被封存的对象会抛出 PicklingError 异常，异常发生时，可能有部分字节已经被写入指定文件中。尝试封存递归层级很深的对象时，可能会超出最大递归层级限制，此时会抛出 RecursionError 异常，可以通过 sys.setrecursionlimit() 调整递归层级，不过请谨慎使用这个函数，因为可能会导致解释器崩溃。</p>
+<p>注意，函数（内置函数或用户自定义函数）在被封存时，引用的是函数全名。这意味着只有函数所在的模块名，与函数名会被封存，函数体及其属性不会被封存。因此，在解封的环境中，函数所属的模块必须是可以被导入的，而且模块必须包含这个函数被封存时的名称，否则会抛出异常。</p>
+<p>同样的，类也只封存名称，所以在解封环境中也有和函数相同的限制。注意，类体及其数据不会被封存，所以在下面的例子中类属性 attr 不会存在于解封后的环境中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Foo</span>:</span><br><span class="line">    attr = <span class="string">&#x27;A class attribute&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;file.pickle&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> handle:</span><br><span class="line">    pickle.dump(Foo, handle)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>用Hex Fiend软件（Windows下的WinHex软件）查看file.pickle文件，可以如下所示，可以看到确实只封存了名称。</p>
+<p><a target="_blank" rel="noopener" href="https://www.z4a.net/image/VuR9O6"><img src="https://www.z4a.net/images/2023/04/25/pth_pickle.png" alt="pth_pickle.png"></a></p>
+<p>这些限制决定了为什么必须在一个模块的最外层定义可封存的函数和类。</p>
+<p>类似的，在封存类的实例时，其类体和类数据不会跟着实例一起被封存，只有实例数据会被封存。这样设计是有目的的，在将来修复类中的错误、给类增加方法之后，仍然可以载入原来版本类实例的封存数据来还原该实例。如果你准备长期使用一个对象，可能会同时存在较多版本的类体，可以为对象添加版本号，这样就可以通过类的 <strong>setstate</strong>() 方法将老版本转换成新版本。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="nwpuhkp">NWPUHKP</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://nwpuhkp.github.io/2023/04/08/learnofpth/">http://nwpuhkp.github.io/2023/04/08/learnofpth/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://nwpuhkp.github.io" target="_blank">The Blog of NWPUHKP</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Pytorch/">Pytorch</a><a class="post-meta__tags" href="/tags/AI/">AI</a></div><div class="post_share"><div class="social-share" data-image="https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img class="cover" src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">论文阅读-Live Trojan Attacks on Deep Neural Networks</div></div></a></div><div class="next-post pull-right"><a href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img class="cover" src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ROP初探之ret2text</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NWPUHKP</div><div class="author-info__description">且视他人之疑目如盏盏鬼火，大胆地去走你的夜路</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/nwpuhkp"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/nwpuhkp" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:kepuhuang@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://space.bilibili.com/57507739" target="_blank" title="Bilibili"><i class="fab fa-bilibili"></i></a><a class="social-icon" href="https://weibo.com/u/6035177688" target="_blank" title="Weibo"><i class="fab fa-weibo"></i></a><a class="social-icon" href="https://s1.ax1x.com/2023/04/02/ppf2g2T.jpg" target="_blank" title="Wechat"><i class="fab fa-weixin"></i></a><a class="social-icon" href="https://twitter.com/huangkepu" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81Pytorch%E4%B8%AD%E6%A8%A1%E5%9E%8B%E4%BF%9D%E5%AD%98%E5%92%8C%E5%8A%A0%E8%BD%BD%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">一、Pytorch中模型保存和加载方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%9D%E5%AD%98-x2F-%E5%8A%A0%E8%BD%BD%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.</span> <span class="toc-text">保存&#x2F;加载模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%BF%9D%E5%AD%98%E6%95%B4%E4%B8%AA%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.1.1.</span> <span class="toc-text">1. 保存整个模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%BB%85%E4%BF%9D%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0%EF%BC%88%E5%AE%98%E6%96%B9%E6%8E%A8%E8%8D%90%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">2. 仅保存模型参数（官方推荐）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%9D%83%E9%87%8D%E5%92%8C%E5%81%8F%E7%BD%AE"><span class="toc-number">2.</span> <span class="toc-text">二、权重和偏置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0%E7%9A%84%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%88%86%E6%9E%90"><span class="toc-number">3.</span> <span class="toc-text">三、模型参数的二进制分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-torch-save-%E5%BA%95%E5%B1%82%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90"><span class="toc-number">3.1.</span> <span class="toc-text">1. torch.save() 底层函数分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-pickle-%E5%BA%8F%E5%88%97%E5%8C%96%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="toc-number">3.2.</span> <span class="toc-text">2.pickle 序列化和反序列化</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Fuzzing of Embedded Systems A Survey"/></a><div class="content"><a class="title" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey">论文阅读-Fuzzing of Embedded Systems A Survey</a><time datetime="2023-06-14T08:54:36.000Z" title="发表于 2023-06-14 16:54:36">2023-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2shellcode"/></a><div class="content"><a class="title" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode">ROP初探之ret2shellcode</a><time datetime="2023-05-06T12:20:36.000Z" title="发表于 2023-05-06 20:20:36">2023-05-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2text"/></a><div class="content"><a class="title" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text">ROP初探之ret2text</a><time datetime="2023-05-05T10:58:16.000Z" title="发表于 2023-05-05 18:58:16">2023-05-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/08/learnofpth/" title="深入理解Pytorch中模型保存文件pth"><img src="https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="深入理解Pytorch中模型保存文件pth"/></a><div class="content"><a class="title" href="/2023/04/08/learnofpth/" title="深入理解Pytorch中模型保存文件pth">深入理解Pytorch中模型保存文件pth</a><time datetime="2023-04-08T01:29:43.000Z" title="发表于 2023-04-08 09:29:43">2023-04-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Live Trojan Attacks on Deep Neural Networks"/></a><div class="content"><a class="title" href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks">论文阅读-Live Trojan Attacks on Deep Neural Networks</a><time datetime="2023-04-03T06:27:54.000Z" title="发表于 2023-04-03 14:27:54">2023-04-03</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2023 By NWPUHKP</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a>&nbsp;<a target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a>&nbsp;<a target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a>&nbsp;<a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a>&nbsp;<a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/"><span>备案号：陕ICP备2022011597号-1</span></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

