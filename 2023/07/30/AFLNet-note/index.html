@@ -1,0 +1,292 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>AFLNET：一种用于网络协议的灰盒模糊器-论文笔记 | The Blog of NWPUHKP</title><meta name="author" content="NWPUHKP"><meta name="copyright" content="NWPUHKP"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记现有服务器模糊测试的困难性：  服务器具有庞大的状态空间 服务器的响应依赖于当前消息和内部服务器状态 现有模糊测试方法在处理服务器模糊测试时的局限性 协议规范和实际协议实现之间的不匹配  AFLNet的创新（解决问题）：  变异方法：AFLNet采用了变异方法，通过对初始语料库中的原始消息序列进行变异来构建测试输入。这样可以生成多个变体，用以增加">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记">
+<meta property="og:url" content="http://nwpuhkp.github.io/2023/07/30/AFLNet-note/index.html">
+<meta property="og:site_name" content="The Blog of NWPUHKP">
+<meta property="og:description" content="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记现有服务器模糊测试的困难性：  服务器具有庞大的状态空间 服务器的响应依赖于当前消息和内部服务器状态 现有模糊测试方法在处理服务器模糊测试时的局限性 协议规范和实际协议实现之间的不匹配  AFLNet的创新（解决问题）：  变异方法：AFLNet采用了变异方法，通过对初始语料库中的原始消息序列进行变异来构建测试输入。这样可以生成多个变体，用以增加">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp">
+<meta property="article:published_time" content="2023-07-30T08:08:16.000Z">
+<meta property="article:modified_time" content="2023-08-08T02:04:36.308Z">
+<meta property="article:author" content="NWPUHKP">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="fuzz">
+<meta property="article:tag" content="论文阅读">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://nwpuhkp.github.io/2023/07/30/AFLNet-note/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: {"limitDay":500,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":80,"languages":{"author":"作者: NWPUHKP","link":"链接: ","source":"来源: The Blog of NWPUHKP","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'AFLNET：一种用于网络协议的灰盒模糊器-论文笔记',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-08-08 10:04:36'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp')"><nav id="nav"><span id="blog-info"><a href="/" title="The Blog of NWPUHKP"><span class="site-name">The Blog of NWPUHKP</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-07-30T08:08:16.000Z" title="发表于 2023-07-30 16:08:16">2023-07-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-08-08T02:04:36.308Z" title="更新于 2023-08-08 10:04:36">2023-08-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/">模糊测试</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">5.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>17分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"><a href="#AFLNET：一种用于网络协议的灰盒模糊器-论文笔记" class="headerlink" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"></a>AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</h1><p>现有服务器模糊测试的困难性：</p>
+<ol>
+<li>服务器具有庞大的状态空间</li>
+<li>服务器的响应依赖于当前消息和内部服务器状态</li>
+<li>现有模糊测试方法在处理服务器模糊测试时的局限性</li>
+<li>协议规范和实际协议实现之间的不匹配</li>
+</ol>
+<p>AFLNet的创新（解决问题）：</p>
+<ol>
+<li>变异方法：AFLNet采用了变异方法，通过对初始语料库中的原始消息序列进行变异来构建测试输入。这样可以生成多个变体，用以增加代码或状态空间覆盖率，进一步提高测试效果。</li>
+<li>利用状态反馈：AFLNet利用服务器的响应代码作为状态反馈来指导模糊测试过程。通过分析反馈信息，AFLNet能够确定模糊测试中所涵盖的服务器状态，从而实现针对状态空间的引导和优化，提高测试效率和发现潜在漏洞的几率。</li>
+<li>无需协议规范或消息语法：与现有协议模糊测试器不同，AFLNet不需要手动提供协议规范或消息语法。它以实际客户端与服务器之间记录的消息交换作为初始语料库，减少了对规范的依赖，并能更好地捕捉到实际协议实现中可能存在的差异。</li>
+</ol>
+<p>现有模糊器无法有效地检测协议漏洞的原因：</p>
+<ol>
+<li>协议具有状态：协议通常涉及到服务器和客户端之间的消息传递和状态转换。服务器根据先前消息的处理结果和当前状态生成响应。然而，经典的模糊测试工具往往无法理解协议的状态信息，无法模拟真实场景下的消息交互。</li>
+<li>消息结构和顺序：协议规定了消息的结构和顺序，只有按照规定的方式发送消息，服务器才能正确处理。经典的模糊测试工具通常不了解消息的结构和顺序要求，只是随机生成字节进行模糊测试，无法产生有效地触发协议漏洞的消息序列。</li>
+<li>缺乏协议规范：有些协议没有明确的规范或文档，只有实现的代码可供分析和测试。这使得模糊测试工具很难确定有效的测试输入和预期的响应，无法充分覆盖协议实现中的所有漏洞。</li>
+</ol>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="网络协议漏洞发现的必要性："><a href="#网络协议漏洞发现的必要性：" class="headerlink" title="网络协议漏洞发现的必要性："></a><strong>网络协议漏洞发现的必要性</strong>：</h3><p>网络协议用于互联网服务器之间或与客户端之间进行高效可靠的通信。协议指定了两个或多个在线方之间可以交换的消息的确切顺序和结构。然而，从世界任何地方都能与服务器进行通信的能力为远程代码执行攻击提供了充分的机会。</p>
+<h3 id="现有模糊器面临的几个挑战："><a href="#现有模糊器面临的几个挑战：" class="headerlink" title="现有模糊器面临的几个挑战："></a><strong>现有模糊器面临的几个挑战</strong>：</h3><p>（基于覆盖率的灰盒模糊器CGF和有状态的黑盒模糊器SBF）</p>
+<ol>
+<li>服务器是有状态且驱动消息的。它接收客户端的一系列消息（也称为请求），处理这些消息并发送适当的响应。然而，实现的协议可能并不完全对应于指定的协议。</li>
+<li>服务器的响应取决于当前消息和当前内部服务器状态，而这些状态受之前消息控制。同时，像AFL和其扩展版本这样的基础CGF模糊测试器既不知道服务器状态信息，也不知道要发送的消息的所需结构或顺序。这些CGF模糊测试器主要被设计用于测试无状态程序（例如文件处理程序），这些程序针对当前输入生成输出，在这种情况下不维护或考虑任何内部状态。</li>
+</ol>
+<h3 id="目前的CGF为测试协议所实现的解决办法："><a href="#目前的CGF为测试协议所实现的解决办法：" class="headerlink" title="目前的CGF为测试协议所实现的解决办法："></a><strong>目前的CGF为测试协议所实现的解决办法</strong>：</h3><ol>
+<li>开发人员需要为单元测试特定程序状态编写测试环境。</li>
+<li>或者将消息序列连接成文件，并将其用作种子进行普通的变异文件模糊测试。</li>
+</ol>
+<h4 id="这些解决方案的问题-："><a href="#这些解决方案的问题-：" class="headerlink" title="*这些解决方案的问题*："></a>*<u>这些解决方案的问题</u>*：</h4><ol>
+<li>尽管单元测试在某些特定的程序状态下是有效的，但它可能无法全面测试多个程序状态之间的交互&#x2F;转换。而且，编写新的测试环境以维护正确的程序状态并避免误报通常需要大量努力。更重要的是，它不适用于无法获取源代码的整个服务器的端到端模糊测试。</li>
+<li>使用连接文件的方法在漏洞发现中效率和效果都很低。首先，对于每个模糊测试迭代，需要变异整个选择的种子文件。假设消息m_i 是最有趣的消息（例如，探索它将获得更高的代码覆盖率和潜在漏洞），CGF会重复变异不感兴趣的消息m_1 到 m_(i-1) ，然后再处理消息m_i ，它并没有关注消息m_i 的知识。其次，由于缺少状态转换信息，CGF可能会产生许多无效的消息序列，这些序列很可能会被SUT拒绝。</li>
+</ol>
+<p>由于CGF在这种问题上的限制，目前对协议漏洞的测试主流仍是有状态的黑盒模糊测试（SBF），这些工具遍历给定的协议模型（以有限状态机或图的形式）并利用在各个状态接受的消息的数据模型&#x2F;语法生成（语法上有效的）消息序列，并对SUT进行压力测试。<strong>但是</strong>，它们的有效性<u>严重依赖于给定的状态模型和数据模型的完整性</u>，这些模型通常是根据开发人员对协议规范和客户端与服务器之间的示例捕获网络流量的理解进行<u>手动编写</u>的。这些手动提供的模型可能无法正确捕捉SUT内部实现的协议。协议规范包含数百页的散文形式的文本。实现者可能会对现有状态进行误解，或者添加新的状态或转换。此外，与其他黑盒方法一样，SBF不会保留有价值的测试用例以供进一步模糊测试。具体来说，即使SBF能够生成导致新的未在状态模型中定义的有趣状态的测试用例，SBF也不会保留此类有价值的测试用例，也不会在运行时更新状态模型。</p>
+<h3 id="AFLNET"><a href="#AFLNET" class="headerlink" title="AFLNET"></a>AFLNET</h3><p>AFLNET - 第一个有状态的覆盖率引导模糊测试工具，旨在解决当前CGF和SBF方法的以上局限性。<u>AFLNET通过使用保留的消息序列的状态覆盖和代码覆盖信息，自动推断状态模型并进行覆盖引导模糊测试，两者相互配合</u>；模糊测试有助于生成覆盖新状态的新消息序列，并使状态模型逐渐变得更加复杂。与此同时，动态构建的状态模型有助于通过使用状态和代码覆盖信息将模糊测试驱动到更重要的代码部分。在两个著名协议的实现（文件传输协议-FTP和实时流媒体协议-RTSP）上对AFLNET进行了评估。初步结果显示，AFLNET在代码覆盖率、状态空间覆盖率和漏洞发现能力方面明显优于最先进的方法。AFLNET在一个RTSP实现中发现了两个之前未知的安全漏洞（已分配CVE编号）。</p>
+<h2 id="Example-FTP"><a href="#Example-FTP" class="headerlink" title="Example : FTP"></a>Example : FTP</h2><h3 id="一些术语和规定设置"><a href="#一些术语和规定设置" class="headerlink" title="一些术语和规定设置"></a>一些术语和规定设置</h3><p>服务器：可以远程访问的软件系统<br>模糊测试器充当客户端，服务器充当模糊目标。</p>
+<p>为了交换信息，网络参与者都发送消息。<strong>一条消息是一个独立的数据包。一系列消息是一组消息的向量</strong>。消息的有效顺序受协议的规定。来自客户端的消息也被称为请求，而来自服务器的消息被称为响应。每个请求可以推进服务器状态，例如从初始状态到已认证状态。服务器状态是服务器在与客户端通信时的特定状态。</p>
+<p><img src="https://www.z4a.net/images/2023/07/27/Snipaste_2023-07-27_16-30-06.png" alt="Snipaste_2023-07-27_16-30-06.png"></p>
+<p>列表 1 展示了在文件传输协议（FTP）和 LightFTP服务器之间的消息交换。客户端发送的消息序列用红色突出显示。FTP 规定客户端必须先在服务器上进行身份认证。只有在成功认证后，客户端才能发出其他命令（即传输参数命令和服务命令）。对于客户端的每个请求消息，FTP 服务器都会回复一个包含状态码的响应消息（例如 230 [登录成功] 或 430 [用户名&#x2F;密码无效]）。响应中的状态码确保客户端的请求被确认，并向客户端提供有关当前服务器状态的信息。</p>
+<h2 id="工具设计与实现"><a href="#工具设计与实现" class="headerlink" title="工具设计与实现"></a>工具设计与实现</h2><p><img src="https://www.z4a.net/images/2023/07/27/Snipaste_2023-07-27_16-30-068fd887463669d4e6.png" alt="Snipaste_2023-07-27_16-30-068fd887463669d4e6.png"></p>
+<h3 id="AFLNet基于AFL架构进行扩展"><a href="#AFLNet基于AFL架构进行扩展" class="headerlink" title="AFLNet基于AFL架构进行扩展"></a>AFLNet基于AFL架构进行扩展</h3><p>为了便于与服务器进行通信，首先实现了<u>通过套接字进行网络通信的功能</u>，这是原始的AFL所不支持的。</p>
+<p>AFLNET支持两个通道，一个用于发送消息，一个用于接收服务器的消息&#x2F;响应。接收响应的通道形成了状态反馈通道，除了所有CGF方法实现的代码覆盖反馈通道。AFLNET使用标准的C套接字API（即connect、poll、send和recv）来实现此功能。为了确保AFLNET与被测试的服务器之间的同步，我们在请求之间添加了延迟。否则，一些服务器实现在发送和确认响应之前接收到新消息时会断开连接。</p>
+<p>AFLNET的<u>输入是包含捕获的网络流量</u>（例如FTP客户端和FTP服务器之间的请求和响应）的pcap文件。要在pcap文件中记录客户端和服务器之间的真实消息交换，可以使用网络嗅探器（例如tcpdump）。可以使用数据包分析器（例如Wireshark）来提取相关的消息交换。例如，我们使用数据包分析器Wireshark自动提取FTP请求的序列。</p>
+<p>AFLNET使用其<u>请求序列解析器组件来生成初始的消息序列语料库</u>。AFLNET使用消息结构的协议特定信息从捕获的网络流量中提取单个请求，并按照正确的顺序进行提取。它<u>首先过滤掉pcap文件中的响应，以获取客户端请求的跟踪</u>。然后，它解析过滤后的跟踪，以识别跟踪中每个消息的起始和结束。实现了一种轻量级方法，根据给定协议中指定的消息格式来查找消息的头部和终止符。例如，每个FTP消息以有效的FTP命令（例如USER、PASS）开头，并以回车符后跟换行符（即0x0D0A）结束。此外，SCGF将序列中的每个消息与相应的服务器状态转换相关联（参见图3）。这是通过逐个发送消息并解析响应来完成的。</p>
+<p><img src="https://www.z4a.net/images/2023/07/27/Snipaste_2023-07-27_19-47-00.png" alt="Snipaste_2023-07-27_19-47-00.png"></p>
+<h3 id="状态学习器"><a href="#状态学习器" class="headerlink" title="状态学习器"></a>状态学习器</h3><p>状态机学习器使用服务器的响应来扩展已实现的协议状态机（IPSM），并添加新观察到的状态和转换。AFLNET将服务器响应读入字节缓冲区，提取协议中指定的状态代码，并确定执行的状态（转换）。如果服务器响应中有新的状态代码，将添加表示新状态的图节点。</p>
+<h3 id="目标状态选择器"><a href="#目标状态选择器" class="headerlink" title="目标状态选择器"></a>目标状态选择器</h3><p>目标状态选择器使用IPSM中的信息选择AFLNET应该关注的目标状态。AFLNET使用可以从学习得到的IPSM中的统计数据计算的多个启发式方法来帮助目标状态选择器选择下一个状态。例如，为了识别模糊测试中很少执行的状态，即模糊测试盲区，它选择一个状态s的概率与执行s的变异消息序列的比例成反比。为了最大化发现新状态转换的概率，AFLNET选择一个具有更高优先级的状态s，该状态在以前的选择中已经成功地对增加代码或状态覆盖率做出了贡献。值得注意的是，<u>只有在模糊测试过程运行了足够长的时间以积累统计数据之后，AFLNET才开始应用这些启发式方法。在开始阶段，目标状态选择器随机选择目标状态</u>。</p>
+<h3 id="序列选择器"><a href="#序列选择器" class="headerlink" title="序列选择器"></a>序列选择器</h3><p>一旦选择了目标状态s，序列选择器从序列语料库中选择一个可以达到状态s的消息序列（即种子输入）。AFL&#x2F;AFLNET将种子语料库（在这里包含消息序列）实现为队列条目的链表。队列条目是包含有关种子输入的相关信息的数据结构。此外，AFLNET还维护一个状态语料库，它包括：</p>
+<ol>
+<li>状态条目的列表，即包含相关状态信息的数据结构</li>
+<li>哈希映射，将状态标识符映射到用于执行与状态标识符对应的状态的队列条目的列表。</li>
+</ol>
+<p>序列选择器利用哈希映射随机选择可以执行状态s的序列（如队列条目）来执行状态s。</p>
+<h3 id="序列变异器"><a href="#序列变异器" class="headerlink" title="序列变异器"></a>序列变异器</h3><p>序列变异器使用具有协议感知的变异操作符来扩展AFL的fuzz_one方法。AFLNET是一种<u>基于变异的模糊测试方法</u>，即从语料库中选择一个种子消息序列并进行变异以生成新的序列。与从头开始生成新消息序列的现有基于生成的方法相比，变异方法具有几个优点。首先，基于变异的方法可以<u>利用真实网络流量的有效跟踪来生成可能有效的新序列，尽管完全没有协议规范</u>。相比之下，基于生成的方法需要详细的协议规范，包括具体的消息模板和协议状态机。其次，基于变异的方法允许演化一个特别有趣的消息序列语料库。生成的序列已经导致了新的状态、状态转换或程序分支的发现，这些序列会被添加到语料库中以供进一步模糊测试。<strong>这种演化方法是基于覆盖率的灰盒模糊测试取得巨大成功的关键</strong>。</p>
+<p>给定一个状态s和一个消息序列M，AFLNET通过变异生成一个新的序列M’。为了确保突变序列M’仍然执行所选择的状态s，AFLNET将原始序列M分成三个部分：1）前缀M1需要到达所选择的状态s，2）候选子序列M2包含在M1之后可以执行的同时仍然保留在s中的所有消息，以及3）后缀M3仅仅是剩余的子序列，使得（M1，M2，M3） &#x3D; M。突变的消息序列M’ &#x3D; （M1，mutate（M2），M3）。通过保持原始子序列M1，M仍将到达状态s，这是模糊器当前关注的状态。突变的候选子序列mutate（M2）在所选择的状态s上产生备选消息序列。在我们最初的实验中，我们观察到替代请求可能“现在”不可观察，但会传播到以后的响应。因此，AFLNET继续执行后缀M3。</p>
+<p>AFLNET提供了几个协议感知的突变算子来修改候选子序列。从消息序列C的语料库，AFLNET产生消息池。消息池是来自网络嗅探器跟踪的实际消息（加上生成的消息）的集合，其可以被添加或替换到现有消息序列M ∈ C中。为了突变候选序列M2，AFLNET支持消息的替换、插入、复制和删除。除了这些协议感知的变异操作符之外，AFLNET还使用从灰盒模糊中已知的常见字节级操作符，例如位翻转以及字节块的替换、插入或删除。突变是堆叠的，即，应用几个协议感知的和字节级的变异操作符来产生变异的候选序列。</p>
+<p>被认为是“感兴趣的”的生成的消息序列M被添加到语料库C。如果服务器响应包含先前未观察到的新状态或状态转换（即，未在IPSM S中记录）;如果序列覆盖了服务器源代码中的新分支，那么它也是有趣的。</p>
+<h3 id="具体结合几个组件后的整体流程"><a href="#具体结合几个组件后的整体流程" class="headerlink" title="具体结合几个组件后的整体流程"></a>具体结合几个组件后的整体流程</h3><p><img src="https://www.z4a.net/images/2023/07/27/Snipaste_2023-07-27_20-50-55.png" alt="Snipaste_2023-07-27_20-50-55.png"></p>
+<ol>
+<li>AFLNET从包含网络流量的pcap文件开始。</li>
+<li>请求序列解析器将pcap文件解析为消息序列（图三），并将其保存到语料库C中。</li>
+<li>状态机学习器根据响应代码构建初始IPSM（在图4中包含黑色节点和转换）</li>
+<li>假设目标状态选择器将状态331（USER foo OK）选择为目标状态，序列选择器随后将从序列语料库C中随机选择一个序列，此时语料库C只包含一个序列。</li>
+<li>序列变异器识别出序列前缀（”USER foo”的请求）、候选子序列（”PASS foo”的请求）和剩余子序列作为后缀。通过使用堆叠变异器来变异候选子序列，序列变异器可能会生成错误的密码请求（”PASS bar”），导致错误状态（530 Not logged in）。在这个错误的密码后面，它重播后缀（如”MKD demo”、”CWD demo”），导致状态530中的循环，因为在成功认证之前，所有这些命令都不被允许。</li>
+<li>最后，发送”QUIT”请求，服务器退出。由于生成的测试序列（如图5所示）覆盖了新的状态和状态转换（如图4中红色部分所示），它被添加到语料库C和IPSM中。</li>
+</ol>
+<p><img src="https://www.z4a.net/images/2023/07/27/Snipaste_2023-07-27_20-53-50.png" alt="Snipaste_2023-07-27_20-53-50.png"></p>
+<h2 id="案例研究（实验）"><a href="#案例研究（实验）" class="headerlink" title="案例研究（实验）"></a>案例研究（实验）</h2><h3 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h3><p>两个基线算法：</p>
+<ol>
+<li>有状态的黑盒模糊器（BOOFuzz）</li>
+<li>无状态的覆盖引导模糊器（AFLNWE【AFL的网络扩展版】）</li>
+</ol>
+<p>评估的两种协议：</p>
+<ol>
+<li>FTP（广泛用于文件传输）</li>
+<li>RTSP（广泛用于流媒体视频传输）</li>
+</ol>
+<p>比较数据：</p>
+<ol>
+<li>平均分支覆盖率</li>
+<li>状态覆盖率</li>
+<li>暴露的错误数量</li>
+</ol>
+<p><img src="https://www.z4a.net/images/2023/07/28/Snipaste_2023-07-28_13-38-51.png" alt="Snipaste_2023-07-28_13-38-51.png"></p>
+<p>设备：<br>使用Live555媒体服务器作为RTSP服务器，并将其安装在类似摄像头这样的隐私和安全关键设备上。</p>
+<p>AFLNET和AFLNWE在启动时使用同一个初始种子库，BOOFUZZ则是使用了协议的详细模型包括消息模板和状态机。</p>
+<p>为了减轻随机性的影响，针对每个实例模糊器都运行了20次。</p>
+<h3 id="代码覆盖和状态覆盖"><a href="#代码覆盖和状态覆盖" class="headerlink" title="代码覆盖和状态覆盖"></a>代码覆盖和状态覆盖</h3><p><img src="https://www.z4a.net/images/2023/07/28/Snipaste_2023-07-28_13-33-47.png" alt="Snipaste_2023-07-28_13-33-47.png"></p>
+<p>实验结果显示，AFLNET在所有的有效性指标上都超过了BOOFUZZ，其效果显著（效应大小大于0.71）</p>
+<p>AFLNET平均增加了<u>60%的分支覆盖率、56%的语句覆盖率和67%的状态覆盖率</u>。</p>
+<p>这种性能提升是由于AFLNET<u>能够变异真实的消息序列，并且演化出一组已被观察到能增加服务器代码覆盖率的消息序列</u>。</p>
+<p>在LightFTP中，AFLNET明显优于AFLNWE。</p>
+<p>在分支覆盖率、语句覆盖率和状态覆盖率方面，增加了121%、79%和85%。</p>
+<p>AFLNWE和AFLNET在Live555中表现相近是因为Live555的实现协议状态机（IPSM）相比LightFTP有较小的深度，即有效序列中的消息数较少。此外，功能状态的数量较少，即大多数状态（除了初始序列已发现的状态）都是错误状态。</p>
+<h3 id="漏洞发现"><a href="#漏洞发现" class="headerlink" title="漏洞发现"></a>漏洞发现</h3><p>对AFLNET、BOOFUZZ和AFLNWE的漏洞发现能力进行了比较。</p>
+<p>AFLNET发现了四个漏洞，其中两个（CVE2018-4013和CVE-2019-7733）是已知的，另外两个漏洞（CVE-2019-7314和CVE-2019-15232）则是0day漏洞。CVE-2019-7314和CVE-2019-15232两个漏洞被评为危急程度9.8分。</p>
+<p><img src="https://www.z4a.net/images/2023/07/28/Snipaste_2023-07-28_13-49-16.png" alt="Snipaste_2023-07-28_13-49-16.png"></p>
+<p>BOOFUZZ和AFLNWE都没有能够发现CVE-2019-7314。进一步分析了CVE-2019-7314的根本原因，发现在SETUP消息包含一个RANGE值7时，存在一个未详细指明的INIT和PLAY状态之间的快捷方式（如图9中的红色部分）。虽然这个快捷方式本身是无害的，但它使得我们的技术能够发现一个0day漏洞。AFLNET生成了一个随机的消息序列来发现这个转换，并系统地对其进行演化以找到0day漏洞。要利用这个漏洞，攻击者需要发送两个消息序列。第一个是包含RANGE值的SETUP消息。第二个是长度大于20,000字节的任意消息。攻击者可以读取被释放的内存中的最多8个字节。由于这个转换在标准的RTSP规范中没有文档记录，BOOFUZZ无法测试Live555中的未详细指明的快捷方式。</p>
+<h2 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h2><p>两种不同的网络模糊测试方法：</p>
+<ol>
+<li>基于覆盖率的灰盒模糊测试</li>
+<li>网络适用的模糊测试</li>
+</ol>
+<h3 id="基于覆盖率的灰盒模糊测试"><a href="#基于覆盖率的灰盒模糊测试" class="headerlink" title="基于覆盖率的灰盒模糊测试"></a>基于覆盖率的灰盒模糊测试</h3><p>基于覆盖率的灰盒模糊测试是指通过生成更多的输入来引导灰盒模糊器，以探索危险或未覆盖的程序语句。与此不同，本文提出了一种基于状态空间的灰盒模糊测试方法，使其能够了解程序的状态空间，例如协议实现。</p>
+<h3 id="网络适用的模糊测试"><a href="#网络适用的模糊测试" class="headerlink" title="网络适用的模糊测试"></a>网络适用的模糊测试</h3><p>网络适用的模糊测试指的是利用网络进行模糊测试的方法。<u>大多数网络适用的模糊器采用黑盒模糊测试的方法，即根据手动构建的协议规范从零开始生成新的消息序列</u>。此外，大多数网络启用的模糊器还采用基于生成的方法，即根据预先指定的消息模板从零开始生成新的消息序列。与此不同，本文中的方法采用了基于变异的方法，通过变异现有的（记录的）消息序列来生成新的消息序列。</p>
+<h3 id="协议实现模糊测试"><a href="#协议实现模糊测试" class="headerlink" title="协议实现模糊测试"></a>协议实现模糊测试</h3><p>在协议实现模糊测试方面，传统的方法包括手动构建协议模型和自动逆向工程协议。手动构建协议模型是费时且容易出错的。相比之下，自逆向工程协议可以从给定的消息集合中学习消息的结构，或者在模糊测试过程中动态地发现消息的结构。这些方法可以被归为黑盒学习和白盒学习两类。与这些方法相比，本文提出了一种轻量级的变异方法，不需要手动构建消息模板或学习协议状态机，而是直接对真实消息进行模糊测试。</p>
+<h2 id="未来展望"><a href="#未来展望" class="headerlink" title="未来展望"></a>未来展望</h2><p>在未来的工作中，计划在其他流行和关键协议上进行更多的实验（例如，安全外壳（SSH）和简单邮件传输协议（SMTP））来评估AFLNET的有效性和效率。此外，还计划扩大AFLNET的适用性，通过增强其状态机器学习算法，以支持不产生响应代码的协议实现。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="nwpuhkp">NWPUHKP</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://nwpuhkp.github.io/2023/07/30/AFLNet-note/">http://nwpuhkp.github.io/2023/07/30/AFLNet-note/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://nwpuhkp.github.io" target="_blank">The Blog of NWPUHKP</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8/">安全</a><a class="post-meta__tags" href="/tags/fuzz/">fuzz</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a></div><div class="post_share"><div class="social-share" data-image="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img class="cover" src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">论文阅读-Fuzzing of Embedded Systems A Survey</div></div></a></div><div class="next-post pull-right"><a href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现"><img class="cover" src="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">AFLNet 复现</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现"><img class="cover" src="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-01</div><div class="title">AFLNet 复现</div></div></a></div><div><a href="/2023/04/03/RSA/" title="RSA密码总结"><img class="cover" src="https://www.z4a.net/images/2023/04/08/into.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">RSA密码总结</div></div></a></div><div><a href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img class="cover" src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">论文阅读-Live Trojan Attacks on Deep Neural Networks</div></div></a></div><div><a href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img class="cover" src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-14</div><div class="title">论文阅读-Fuzzing of Embedded Systems A Survey</div></div></a></div><div><a href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img class="cover" src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-05</div><div class="title">ROP初探之ret2text</div></div></a></div><div><a href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img class="cover" src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-06</div><div class="title">ROP初探之ret2shellcode</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NWPUHKP</div><div class="author-info__description">且视他人之疑目如盏盏鬼火，大胆地去走你的夜路</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/nwpuhkp"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/nwpuhkp" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:kepuhuang@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://space.bilibili.com/57507739" target="_blank" title="Bilibili"><i class="fab fa-bilibili"></i></a><a class="social-icon" href="https://weibo.com/u/6035177688" target="_blank" title="Weibo"><i class="fab fa-weibo"></i></a><a class="social-icon" href="https://s1.ax1x.com/2023/04/02/ppf2g2T.jpg" target="_blank" title="Wechat"><i class="fab fa-weixin"></i></a><a class="social-icon" href="https://twitter.com/huangkepu" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#AFLNET%EF%BC%9A%E4%B8%80%E7%A7%8D%E7%94%A8%E4%BA%8E%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E7%9A%84%E7%81%B0%E7%9B%92%E6%A8%A1%E7%B3%8A%E5%99%A8-%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0"><span class="toc-number">1.</span> <span class="toc-text">AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Introduction"><span class="toc-number">1.1.</span> <span class="toc-text">Introduction</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E6%BC%8F%E6%B4%9E%E5%8F%91%E7%8E%B0%E7%9A%84%E5%BF%85%E8%A6%81%E6%80%A7%EF%BC%9A"><span class="toc-number">1.1.1.</span> <span class="toc-text">网络协议漏洞发现的必要性：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%B0%E6%9C%89%E6%A8%A1%E7%B3%8A%E5%99%A8%E9%9D%A2%E4%B8%B4%E7%9A%84%E5%87%A0%E4%B8%AA%E6%8C%91%E6%88%98%EF%BC%9A"><span class="toc-number">1.1.2.</span> <span class="toc-text">现有模糊器面临的几个挑战：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%AE%E5%89%8D%E7%9A%84CGF%E4%B8%BA%E6%B5%8B%E8%AF%95%E5%8D%8F%E8%AE%AE%E6%89%80%E5%AE%9E%E7%8E%B0%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95%EF%BC%9A"><span class="toc-number">1.1.3.</span> <span class="toc-text">目前的CGF为测试协议所实现的解决办法：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%99%E4%BA%9B%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E7%9A%84%E9%97%AE%E9%A2%98-%EF%BC%9A"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">*这些解决方案的问题*：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AFLNET"><span class="toc-number">1.1.4.</span> <span class="toc-text">AFLNET</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Example-FTP"><span class="toc-number">1.2.</span> <span class="toc-text">Example : FTP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E6%9C%AF%E8%AF%AD%E5%92%8C%E8%A7%84%E5%AE%9A%E8%AE%BE%E7%BD%AE"><span class="toc-number">1.2.1.</span> <span class="toc-text">一些术语和规定设置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.3.</span> <span class="toc-text">工具设计与实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AFLNet%E5%9F%BA%E4%BA%8EAFL%E6%9E%B6%E6%9E%84%E8%BF%9B%E8%A1%8C%E6%89%A9%E5%B1%95"><span class="toc-number">1.3.1.</span> <span class="toc-text">AFLNet基于AFL架构进行扩展</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E5%AD%A6%E4%B9%A0%E5%99%A8"><span class="toc-number">1.3.2.</span> <span class="toc-text">状态学习器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%AE%E6%A0%87%E7%8A%B6%E6%80%81%E9%80%89%E6%8B%A9%E5%99%A8"><span class="toc-number">1.3.3.</span> <span class="toc-text">目标状态选择器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%8F%E5%88%97%E9%80%89%E6%8B%A9%E5%99%A8"><span class="toc-number">1.3.4.</span> <span class="toc-text">序列选择器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%8F%E5%88%97%E5%8F%98%E5%BC%82%E5%99%A8"><span class="toc-number">1.3.5.</span> <span class="toc-text">序列变异器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E7%BB%93%E5%90%88%E5%87%A0%E4%B8%AA%E7%BB%84%E4%BB%B6%E5%90%8E%E7%9A%84%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="toc-number">1.3.6.</span> <span class="toc-text">具体结合几个组件后的整体流程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%E7%A0%94%E7%A9%B6%EF%BC%88%E5%AE%9E%E9%AA%8C%EF%BC%89"><span class="toc-number">1.4.</span> <span class="toc-text">案例研究（实验）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="toc-number">1.4.1.</span> <span class="toc-text">实验设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E5%92%8C%E7%8A%B6%E6%80%81%E8%A6%86%E7%9B%96"><span class="toc-number">1.4.2.</span> <span class="toc-text">代码覆盖和状态覆盖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%8F%91%E7%8E%B0"><span class="toc-number">1.4.3.</span> <span class="toc-text">漏洞发现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="toc-number">1.5.</span> <span class="toc-text">相关工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E8%A6%86%E7%9B%96%E7%8E%87%E7%9A%84%E7%81%B0%E7%9B%92%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-number">1.5.1.</span> <span class="toc-text">基于覆盖率的灰盒模糊测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E9%80%82%E7%94%A8%E7%9A%84%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-number">1.5.2.</span> <span class="toc-text">网络适用的模糊测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95"><span class="toc-number">1.5.3.</span> <span class="toc-text">协议实现模糊测试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AA%E6%9D%A5%E5%B1%95%E6%9C%9B"><span class="toc-number">1.6.</span> <span class="toc-text">未来展望</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现"><img src="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AFLNet 复现"/></a><div class="content"><a class="title" href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现">AFLNet 复现</a><time datetime="2023-08-01T02:05:36.000Z" title="发表于 2023-08-01 10:05:36">2023-08-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"><img src="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"/></a><div class="content"><a class="title" href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记">AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</a><time datetime="2023-07-30T08:08:16.000Z" title="发表于 2023-07-30 16:08:16">2023-07-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Fuzzing of Embedded Systems A Survey"/></a><div class="content"><a class="title" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey">论文阅读-Fuzzing of Embedded Systems A Survey</a><time datetime="2023-06-14T08:54:36.000Z" title="发表于 2023-06-14 16:54:36">2023-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2shellcode"/></a><div class="content"><a class="title" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode">ROP初探之ret2shellcode</a><time datetime="2023-05-06T12:20:36.000Z" title="发表于 2023-05-06 20:20:36">2023-05-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2text"/></a><div class="content"><a class="title" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text">ROP初探之ret2text</a><time datetime="2023-05-05T10:58:16.000Z" title="发表于 2023-05-05 18:58:16">2023-05-05</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp')"><div id="footer-wrap"><div class="copyright">&copy;2023 By NWPUHKP</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a>&nbsp;<a target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a>&nbsp;<a target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a>&nbsp;<a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a>&nbsp;<a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/"><span>备案号：陕ICP备2022011597号-1</span></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

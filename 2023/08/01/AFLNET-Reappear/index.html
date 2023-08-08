@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>AFLNet 复现 | The Blog of NWPUHKP</title><meta name="author" content="NWPUHKP"><meta name="copyright" content="NWPUHKP"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="AFLNet 复现AFLNet官方Github仓库 1. 环境配置（AFL安装）1.1. 系统环境官方推荐Ubuntu 18.04和16.04 64位系统，本次实验使用的是Ubuntu 18.04。 需要clang和llvm，以及一些其他依赖项（graphviz-dev libcap-dev） 1234# Install clang (as required by AFL&#x2F;AFLNet to en">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AFLNet 复现">
+<meta property="og:url" content="http://nwpuhkp.github.io/2023/08/01/AFLNET-Reappear/index.html">
+<meta property="og:site_name" content="The Blog of NWPUHKP">
+<meta property="og:description" content="AFLNet 复现AFLNet官方Github仓库 1. 环境配置（AFL安装）1.1. 系统环境官方推荐Ubuntu 18.04和16.04 64位系统，本次实验使用的是Ubuntu 18.04。 需要clang和llvm，以及一些其他依赖项（graphviz-dev libcap-dev） 1234# Install clang (as required by AFL&#x2F;AFLNet to en">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg">
+<meta property="article:published_time" content="2023-08-01T02:05:36.000Z">
+<meta property="article:modified_time" content="2023-08-08T02:07:07.937Z">
+<meta property="article:author" content="NWPUHKP">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="模糊测试">
+<meta property="article:tag" content="fuzz">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://nwpuhkp.github.io/2023/08/01/AFLNET-Reappear/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: {"limitDay":500,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":80,"languages":{"author":"作者: NWPUHKP","link":"链接: ","source":"来源: The Blog of NWPUHKP","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'AFLNet 复现',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-08-08 10:07:07'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="The Blog of NWPUHKP"><span class="site-name">The Blog of NWPUHKP</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">AFLNet 复现</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-08-01T02:05:36.000Z" title="发表于 2023-08-01 10:05:36">2023-08-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-08-08T02:07:07.937Z" title="更新于 2023-08-08 10:07:07">2023-08-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E5%A4%8D%E7%8E%B0/">论文复现</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E5%A4%8D%E7%8E%B0/%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/">模糊测试</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="AFLNet 复现"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="AFLNet-复现"><a href="#AFLNet-复现" class="headerlink" title="AFLNet 复现"></a>AFLNet 复现</h1><p><a target="_blank" rel="noopener" href="https://github.com/aflnet/aflnet">AFLNet官方Github仓库</a></p>
+<h2 id="1-环境配置（AFL安装）"><a href="#1-环境配置（AFL安装）" class="headerlink" title="1. 环境配置（AFL安装）"></a>1. 环境配置（AFL安装）</h2><h3 id="1-1-系统环境"><a href="#1-1-系统环境" class="headerlink" title="1.1. 系统环境"></a>1.1. 系统环境</h3><p>官方推荐Ubuntu 18.04和16.04 64位系统，本次实验使用的是Ubuntu 18.04。</p>
+<p>需要clang和llvm，以及一些其他依赖项（graphviz-dev libcap-dev）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Install clang (as required by AFL/AFLNet to enable llvm_mode)</span></span><br><span class="line">sudo apt-get install clang</span><br><span class="line"><span class="comment"># Install graphviz development</span></span><br><span class="line">sudo apt-get install graphviz-dev libcap-dev</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-安装AFLNet"><a href="#1-2-安装AFLNet" class="headerlink" title="1.2. 安装AFLNet"></a>1.2. 安装AFLNet</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 从aflnet仓库中拉取源代码</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/aflnet/aflnet.git aflnet</span><br><span class="line"><span class="comment"># 进入aflnet目录</span></span><br><span class="line"><span class="built_in">cd</span> aflnet</span><br><span class="line"><span class="comment"># 编译aflnet</span></span><br><span class="line">make clean all</span><br><span class="line"><span class="comment"># 进入llvm_mode目录</span></span><br><span class="line"><span class="built_in">cd</span> llvm_mode</span><br><span class="line"><span class="comment"># 设置llvm_config环境变量,如果采用apt-get安装的clang,llvm-config应该是/usr/bin/llvm-config-6.0</span></span><br><span class="line"><span class="built_in">export</span> LLVM_CONFIG=/usr/bin/llvm-config-6.0</span><br><span class="line"><span class="comment"># 编译llvm_mode</span></span><br><span class="line">make</span><br><span class="line"><span class="comment"># 返回到安装目录</span></span><br><span class="line"><span class="built_in">cd</span> ../..</span><br><span class="line"><span class="comment"># 设置环境变量</span></span><br><span class="line"><span class="built_in">export</span> AFLNET=$(<span class="built_in">pwd</span>)/aflnet</span><br><span class="line"><span class="built_in">export</span> WORKDIR=$(<span class="built_in">pwd</span>)</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$AFLNET</span></span><br><span class="line"><span class="built_in">export</span> AFL_PATH=<span class="variable">$AFLNET</span></span><br><span class="line"><span class="comment"># 验证是否安装完成</span></span><br><span class="line">afl-fuzz --<span class="built_in">help</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://www.z4a.net/images/2023/07/30/aflnet-finish.png" alt="aflnet-finish.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">-N netinfo: server information (e.g., tcp://127.0.0.1/8554)</span><br><span class="line"></span><br><span class="line">-P protocol: application protocol to be tested (e.g., RTSP, FTP, DTLS12, DNS, DICOM, SMTP, SSH, TLS, DAAP-HTTP, SIP)</span><br><span class="line"></span><br><span class="line">-D usec: (optional) waiting time (in microseconds) for the server to complete its initialization</span><br><span class="line"></span><br><span class="line">-e netnsname: (optional) network namespace name to run the server in</span><br><span class="line"></span><br><span class="line">-K : (optional) send SIGTERM signal to gracefully terminate the server after consuming all request messages</span><br><span class="line"></span><br><span class="line">-E : (optional) enable state aware mode</span><br><span class="line"></span><br><span class="line">-R : (optional) enable region-level mutation operators</span><br><span class="line"></span><br><span class="line">-F : (optional) enable false negative reduction mode</span><br><span class="line"></span><br><span class="line">-c script : (optional) name or full path to a script for server cleanup</span><br><span class="line"></span><br><span class="line">-q algo: (optional) state selection algorithm (e.g., 1. RANDOM_SELECTION, 2. ROUND_ROBIN, 3. FAVOR)</span><br><span class="line"></span><br><span class="line">-s algo: (optional) seed selection algorithm (e.g., 1. RANDOM_SELECTION, 2. ROUND_ROBIN, 3. FAVOR)</span><br></pre></td></tr></table></figure>
+<p>示例命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">afl-fuzz -d -i <span class="keyword">in</span> -o out -N &lt;server info&gt; -x &lt;dictionary file&gt; -P &lt;protocol&gt; -D 10000 -q 3 -s 3 -E -K -R &lt;executable binary and its arguments (e.g., port number)&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-实验"><a href="#2-实验" class="headerlink" title="2. 实验"></a>2. 实验</h2><h3 id="2-1-实验1：live555-RTSP服务器"><a href="#2-1-实验1：live555-RTSP服务器" class="headerlink" title="2.1. 实验1：live555 RTSP服务器"></a>2.1. 实验1：live555 RTSP服务器</h3><h4 id="实验内容"><a href="#实验内容" class="headerlink" title="实验内容"></a>实验内容</h4><p>如何使用AFLNet来模糊<a target="_blank" rel="noopener" href="http://live555.com/">Live555</a>并发现其RTSP服务器参考实现（testOnDemandRTSPServer）中的错误。</p>
+<h4 id="实验环境"><a href="#实验环境" class="headerlink" title="实验环境"></a>实验环境</h4><p>live555下载渠道：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="http://live555.com/liveMedia/public/">live555官方资源站</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/rgaufman/live555">live555 Github仓库</a></li>
+</ol>
+<p>本次实验采取的是live555在2018年8月28日上传到Github的版本，其代码为ceeb4f4。</p>
+<p><img src="https://www.z4a.net/images/2023/07/30/aflgit.png" alt="aflgit.png"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 到工作目录</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$workspace</span></span><br><span class="line"><span class="comment"># Clone live555</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/rgaufman/live555.git</span><br><span class="line"><span class="comment"># 进入live555目录</span></span><br><span class="line"><span class="built_in">cd</span> live555</span><br><span class="line"><span class="comment"># 切换live555版本</span></span><br><span class="line">git checkout ceeb4f4</span><br><span class="line"><span class="comment"># 使用补丁</span></span><br><span class="line">patch -p1 &lt; <span class="variable">$AFLNET</span>/tutorials/live555/ceeb4f4.patch</span><br><span class="line"><span class="comment"># 生成Makefile</span></span><br><span class="line">./genMakefiles linux</span><br><span class="line"><span class="comment"># 编译</span></span><br><span class="line">make clean all</span><br></pre></td></tr></table></figure>
+<p><img src="https://www.z4a.net/images/2023/07/30/patch.png" alt="patch.png"></p>
+<p>ceeb4f4.patch补丁作用：生成使用 afl-clang-fast++ 执行覆盖反馈启用检测的 Makefile 的更改之外，还进行了一个小更改以禁用 Live555 中的随机会话 ID 生成。在 Live555 的未修改版本中，它为每个连接生成一个会话 ID，会话 ID 应包含在从连接的客户端发送的后续请求中。否则，请求会很快被服务器拒绝，这会导致模糊测试时出现不确定的路径。具体而言，同一消息序列可能会执行不同的服务器路径，因为会话 ID 正在更改。通过修改 Live555 来处理此特定问题，使其始终生成相同的会话 ID。</p>
+<p>live555源代码编译成功后，我们所需要的被测试的服务器（testOnDemandRTSPServer）和RTSP客户端（testRTSPClient）都处于 testProgs 文件夹中。</p>
+<p>测试服务器：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 去到服务器和客户端的文件目录下</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$workspace</span>/live555/testProgs</span><br><span class="line"><span class="comment"># 复制相同的媒体资源到服务器文件目录下</span></span><br><span class="line"><span class="built_in">cp</span> <span class="variable">$AFLNET</span>/tutorials/live555/sample_media_source/*.* ./</span><br><span class="line"><span class="comment"># 启动服务器端口号使用8554</span></span><br><span class="line">./testOnDemandRTSPServer 8554</span><br><span class="line"><span class="comment"># 在另一个终端中启动客户端</span></span><br><span class="line">./testRTSPClient rtsp://127.0.0.1:8554/wavAudioTest</span><br></pre></td></tr></table></figure>
+<p><img src="https://www.z4a.net/images/2023/07/30/server.png" alt="server.png"></p>
+<p><img src="https://www.z4a.net/images/2023/07/30/client.png" alt="client.png"></p>
+<h4 id="实验开始"><a href="#实验开始" class="headerlink" title="实验开始"></a>实验开始</h4><p><u>捕获消息序列作为种子输入</u></p>
+<p>AFLNet 将消息序列作为种子输入，因此我们首先捕获示例客户端 （testRTSPClient） 和受测服务器 （SUT） 之间的一些示例使用场景。需要根据服务器根据请求将 WAV 格式的音频文件流式传输到客户端的使用场景为 AFLNet 准备种子输入。可以遵循相同的步骤为其他媒体源文件（例如，WebM，MP3）准备其他种子输入。</p>
+<ol>
+<li><p>启动被测服务器：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 去到服务器和客户端的文件目录下</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$workspace</span>/live555/testProgs</span><br><span class="line">./testOnDemandRTSPServer 8554</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用tcpdump捕获服务器和客户端之间的消息序列：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tcpdump -i lo -w rtsp.pcap port 8554</span><br></pre></td></tr></table></figure>
+<p><img src="https://www.z4a.net/images/2023/07/30/tcpdump.png" alt="tcpdump.png"></p>
+</li>
+<li><p>上述步骤完成后，启动客户端：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> <span class="variable">$workspace</span>/live555/testProgs</span><br><span class="line">./testRTSPClient rtsp://127.0.0.1:8554/wavAudioTest</span><br></pre></td></tr></table></figure>
+<p>在客户端运行结束后，停止tcpdump捕获。客户端与服务器之间的消息序列将被保存在rtsp.pcap文件中。该文件可以使用wirehsark打开，并提取客户端发给服务器的消息序列（请求），并将请求序列作为AFLNet的种子输入。</p>
+</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装wirehsark</span></span><br><span class="line">sudo apt-get install wireshark</span><br><span class="line"><span class="comment"># 打开rtsp.pcap文件</span></span><br><span class="line">wireshark rtsp.pcap</span><br></pre></td></tr></table></figure>
+
+<p>以多行显示数据包（请求和响应），一行表示一个数据包。</p>
+<p><img src="https://www.z4a.net/images/2023/07/30/wireshark1.png" alt="wireshark1.png"></p>
+<p>使用Follow-&gt;TCP提取请求序列。</p>
+<p><img src="https://www.z4a.net/images/2023/07/30/wireshark2.png" alt="wireshark2.png"></p>
+<p>Wireshark将以纯文本形式显示所有请求和响应。</p>
+<p><img src="https://www.z4a.net/images/2023/07/30/wire3.png" alt="wire3.png"></p>
+<p>由于只需要客户端向服务器请求的流量。</p>
+<p><img src="https://www.z4a.net/images/2023/07/30/wire4.png" alt="wire4.png"><br><img src="https://www.z4a.net/images/2023/07/30/wire5.png" alt="wire5.png"></p>
+<p>最后以二进制的形式保存请求序列。</p>
+<p><img src="https://www.z4a.net/images/2023/07/30/wire6.png" alt="wire6.png"></p>
+<p>fuzz：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> <span class="variable">$workspace</span>/live555/testProgs</span><br><span class="line"><span class="comment"># 使用AFLNet的afl-fuzz进行模糊测试</span></span><br><span class="line">afl-fuzz -d -i <span class="variable">$AFLNET</span>/tutorials/live555/in-rtsp -o out-live555 -N tcp://127.0.0.1/8554 -x <span class="variable">$AFLNET</span>/tutorials/live555/rtsp.dict -P RTSP -D 10000 -q 3 -s 3 -E -K -R ./testOnDemandRTSPServer 8554</span><br></pre></td></tr></table></figure>
+<p>一旦 AFLNet 发现错误（例如，崩溃或挂起），包含触发错误的消息序列的测试用例将被存储在 或 文件夹中。在模糊测试过程中，AFLNet 状态机器学习组件不断推断 SUT 的输入状态机，并相应地更新 .dot 文件 （ipsm.dot），以便用户可以查看该文件（使用 xdot 等 .dot 查看器）来监控 AFLNet 在协议推理方面的当前进度。</p>
+<p>部分Fuzz结果：</p>
+<p><img src="https://www.z4a.net/images/2023/07/30/aflnet-live555-afl.png" alt="aflnet-live555-afl.png"></p>
+<p>后续复现实验待更新ing…</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="nwpuhkp">NWPUHKP</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://nwpuhkp.github.io/2023/08/01/AFLNET-Reappear/">http://nwpuhkp.github.io/2023/08/01/AFLNET-Reappear/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://nwpuhkp.github.io" target="_blank">The Blog of NWPUHKP</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8/">安全</a><a class="post-meta__tags" href="/tags/%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/">模糊测试</a><a class="post-meta__tags" href="/tags/fuzz/">fuzz</a></div><div class="post_share"><div class="social-share" data-image="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"><img class="cover" src="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img class="cover" src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-14</div><div class="title">论文阅读-Fuzzing of Embedded Systems A Survey</div></div></a></div><div><a href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"><img class="cover" src="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-07-30</div><div class="title">AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</div></div></a></div><div><a href="/2023/04/03/RSA/" title="RSA密码总结"><img class="cover" src="https://www.z4a.net/images/2023/04/08/into.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">RSA密码总结</div></div></a></div><div><a href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img class="cover" src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">论文阅读-Live Trojan Attacks on Deep Neural Networks</div></div></a></div><div><a href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img class="cover" src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-05</div><div class="title">ROP初探之ret2text</div></div></a></div><div><a href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img class="cover" src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-06</div><div class="title">ROP初探之ret2shellcode</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NWPUHKP</div><div class="author-info__description">且视他人之疑目如盏盏鬼火，大胆地去走你的夜路</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/nwpuhkp"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/nwpuhkp" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:kepuhuang@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://space.bilibili.com/57507739" target="_blank" title="Bilibili"><i class="fab fa-bilibili"></i></a><a class="social-icon" href="https://weibo.com/u/6035177688" target="_blank" title="Weibo"><i class="fab fa-weibo"></i></a><a class="social-icon" href="https://s1.ax1x.com/2023/04/02/ppf2g2T.jpg" target="_blank" title="Wechat"><i class="fab fa-weixin"></i></a><a class="social-icon" href="https://twitter.com/huangkepu" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#AFLNet-%E5%A4%8D%E7%8E%B0"><span class="toc-number">1.</span> <span class="toc-text">AFLNet 复现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%EF%BC%88AFL%E5%AE%89%E8%A3%85%EF%BC%89"><span class="toc-number">1.1.</span> <span class="toc-text">1. 环境配置（AFL安装）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E7%B3%BB%E7%BB%9F%E7%8E%AF%E5%A2%83"><span class="toc-number">1.1.1.</span> <span class="toc-text">1.1. 系统环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%AE%89%E8%A3%85AFLNet"><span class="toc-number">1.1.2.</span> <span class="toc-text">1.2. 安装AFLNet</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%9E%E9%AA%8C"><span class="toc-number">1.2.</span> <span class="toc-text">2. 实验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E5%AE%9E%E9%AA%8C1%EF%BC%9Alive555-RTSP%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">1.2.1.</span> <span class="toc-text">2.1. 实验1：live555 RTSP服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E5%86%85%E5%AE%B9"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">实验内容</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">实验环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E5%BC%80%E5%A7%8B"><span class="toc-number">1.2.1.3.</span> <span class="toc-text">实验开始</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现"><img src="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AFLNet 复现"/></a><div class="content"><a class="title" href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现">AFLNet 复现</a><time datetime="2023-08-01T02:05:36.000Z" title="发表于 2023-08-01 10:05:36">2023-08-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"><img src="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"/></a><div class="content"><a class="title" href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记">AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</a><time datetime="2023-07-30T08:08:16.000Z" title="发表于 2023-07-30 16:08:16">2023-07-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Fuzzing of Embedded Systems A Survey"/></a><div class="content"><a class="title" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey">论文阅读-Fuzzing of Embedded Systems A Survey</a><time datetime="2023-06-14T08:54:36.000Z" title="发表于 2023-06-14 16:54:36">2023-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2shellcode"/></a><div class="content"><a class="title" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode">ROP初探之ret2shellcode</a><time datetime="2023-05-06T12:20:36.000Z" title="发表于 2023-05-06 20:20:36">2023-05-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2text"/></a><div class="content"><a class="title" href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text">ROP初探之ret2text</a><time datetime="2023-05-05T10:58:16.000Z" title="发表于 2023-05-05 18:58:16">2023-05-05</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2023 By NWPUHKP</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a>&nbsp;<a target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a>&nbsp;<a target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a>&nbsp;<a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a>&nbsp;<a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/"><span>备案号：陕ICP备2022011597号-1</span></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
