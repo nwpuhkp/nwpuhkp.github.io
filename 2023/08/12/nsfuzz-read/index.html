@@ -1,0 +1,325 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读 | The Blog of NWPUHKP</title><meta name="author" content="NWPUHKP"><meta name="copyright" content="NWPUHKP"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="NSFuzz: Towards Efficient and State-Aware Network Service Fuzzing-论文阅读Introduction前作在nsfuzz之前的一些工作是如何对有状态的网络应用的灰盒模糊测试的。 AFLNet原理：  aflnet通过从响应消息中提取响应码来表示服务状态，并使用响应码序列推断协议实现的状态模型，进一步利用推断的模型指导模糊测试过程。 利用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读">
+<meta property="og:url" content="http://nwpuhkp.github.io/2023/08/12/nsfuzz-read/index.html">
+<meta property="og:site_name" content="The Blog of NWPUHKP">
+<meta property="og:description" content="NSFuzz: Towards Efficient and State-Aware Network Service Fuzzing-论文阅读Introduction前作在nsfuzz之前的一些工作是如何对有状态的网络应用的灰盒模糊测试的。 AFLNet原理：  aflnet通过从响应消息中提取响应码来表示服务状态，并使用响应码序列推断协议实现的状态模型，进一步利用推断的模型指导模糊测试过程。 利用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.z4a.net/images/2023/08/12/1322753.md.jpg">
+<meta property="article:published_time" content="2023-08-12T12:51:19.000Z">
+<meta property="article:modified_time" content="2023-08-12T12:51:19.543Z">
+<meta property="article:author" content="NWPUHKP">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="fuzz">
+<meta property="article:tag" content="论文">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.z4a.net/images/2023/08/12/1322753.md.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://nwpuhkp.github.io/2023/08/12/nsfuzz-read/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: {"limitDay":500,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":80,"languages":{"author":"作者: NWPUHKP","link":"链接: ","source":"来源: The Blog of NWPUHKP","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-08-12 20:51:19'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://www.z4a.net/images/2023/08/12/1322753.md.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="The Blog of NWPUHKP"><span class="site-name">The Blog of NWPUHKP</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-08-12T12:51:19.000Z" title="发表于 2023-08-12 20:51:19">2023-08-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-08-12T12:51:19.543Z" title="更新于 2023-08-12 20:51:19">2023-08-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">论文阅读</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/">模糊测试</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">7.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>21分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="NSFuzz-Towards-Efficient-and-State-Aware-Network-Service-Fuzzing-论文阅读"><a href="#NSFuzz-Towards-Efficient-and-State-Aware-Network-Service-Fuzzing-论文阅读" class="headerlink" title="NSFuzz: Towards Efficient and State-Aware Network Service Fuzzing-论文阅读"></a>NSFuzz: Towards Efficient and State-Aware Network Service Fuzzing-论文阅读</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="前作"><a href="#前作" class="headerlink" title="前作"></a>前作</h3><p>在nsfuzz之前的一些工作是如何对有状态的网络应用的灰盒模糊测试的。</p>
+<h4 id="AFLNet"><a href="#AFLNet" class="headerlink" title="AFLNet"></a>AFLNet</h4><p>原理：</p>
+<ul>
+<li>aflnet通过从响应消息中提取<strong>响应码来表示服务状态</strong>，并使用响应码序列推断协议实现的状态模型，进一步利用推断的模型指导模糊测试过程。</li>
+<li>利用<strong>推断的状态模型</strong>指导模糊测试：aflnet根据协议实现的状态模型，在模糊测试过程中指导生成的输入，以更好地探索协议实现的代码路径和增加代码覆盖率。</li>
+</ul>
+<p>不足：</p>
+<ul>
+<li>状态表示的挑战：aflnet提出的响应码方案假设协议会在响应消息中嵌入特殊的编码，这在实际情况下并不总是成立。因此，这种基于响应码的状态表示方案可能不适用于所有的网络服务。</li>
+<li>测试效率的挑战：由于没有明确的信号指示被测试的网络服务是否已经完成对一个消息的处理，aflnet使用一个固定的定时器来控制模糊测试器发送消息给被测试的网络服务。然而，定时器的时间窗口要么太短（这样被测试的网络服务可能会错过模糊测试器发送的消息），要么太长（这样模糊测试器会在等待中浪费太多时间），从而影响了模糊测试的效率。</li>
+</ul>
+<h4 id="statefuzz"><a href="#statefuzz" class="headerlink" title="statefuzz"></a>statefuzz</h4><p>原理：</p>
+<ul>
+<li>statefuzz通过抽象符号执行和动态二进制分析技术，捕获和表示网络服务的状态信息，并在模糊测试过程中持续更新和利用这些状态信息。通过准确地表示网络服务的状态，statefuzz能够更好地引导模糊测试过程，提高测试用例的质量和效率。</li>
+<li>利用状态信息优化模糊测试：statefuzz使用状态信息来引导探索测试路径，通过符号执行技术生成具有高覆盖率的测试用例。同时，statefuzz还利用状态信息的汇总来生成更多的有效测试用例，从而增加网络服务中漏洞的发现几率。</li>
+</ul>
+<p>不足：</p>
+<ul>
+<li>运行时开销较大：statefuzz需要对网络服务进行动态二进制分析和抽象符号执行，并在运行过程中捕获和更新状态信息。这些额外的运行时操作会导致较大的性能开销，使得模糊测试的过程变得较慢。</li>
+<li>对协议解析的依赖：statefuzz需要分析网络服务的协议实现来获取状态信息。如果协议实现复杂或者没有明确定义的协议规范，statefuzz可能会遇到困难，难以准确捕获和表示网络服务的状态。</li>
+</ul>
+<h3 id="待解决的问题"><a href="#待解决的问题" class="headerlink" title="待解决的问题"></a>待解决的问题</h3><ol>
+<li><p>状态表示的困难性：现有的模糊测试工具对网络应用的状态表示还存在问题。例如，AFLNET采用了从响应消息中提取响应码的方式来表示服务状态，但这种方法假设协议会在响应消息中嵌入特殊代码，而实际情况并非都是这样。此外，如STATEAFL所指出的，响应码只能提供服务状态的很差指示，甚至可能导致冗余的状态。</p>
+</li>
+<li><p>测试效率的挑战：由于没有明确的信号表明被测系统是否已经完成处理一个消息，目前的模糊测试工具使用固定的定时器来控制模糊器向被测系统发送消息。然而，定时器的时间窗口要么太短（这样被测系统可能会错过模糊器发送的消息），要么太长（这样模糊器将浪费太多时间等待）。此外，STATEAFL需要进行后执行分析来收集状态序列和推断状态模型，这会引入额外的运行时开销，并进一步降低测试吞吐量。</p>
+</li>
+</ol>
+<h3 id="nsfuzz的贡献"><a href="#nsfuzz的贡献" class="headerlink" title="nsfuzz的贡献"></a>nsfuzz的贡献</h3><p>作者通过研究多个代表性的网络服务程序，发现这些程序通常使用程序变量直接描述程序状态。此外，网络服务往往包含一个网络事件循环，负责分发传入的消息。</p>
+<ul>
+<li>为了解决第一个挑战，作者提出了一种轻量级基于变量的状态表示方案，以更高的准确性表示服务状态。</li>
+<li>对于第二个挑战，可以利用网络服务的内在事件循环来产生适当的信号反馈，从而实现网络服务与模糊器之间的高效同步，并促使模糊器发送新消息以减少等待时间开销。</li>
+<li>此外，基于信号的同步还可以使模糊器主动进行状态序列收集和状态模型推断，从而避免STATEAFL所使用的繁重的执行后分析。</li>
+</ul>
+<p>具体：<br>作者使用静态分析自动识别网络服务的网络事件循环和状态变量，并进行轻量级的编译时插桩，以实现状态感知模糊测试和基于信号的快速I&#x2F;O同步。评估结果表明，NSFuzz在模糊测试过程中能够推断出更准确的状态模型，并且其模糊测试吞吐量显著高于AFLNET和STATEAFL。此外，NSFuzz能够在更短的时间内达到更高的覆盖率并触发崩溃。</p>
+<p>贡献点：</p>
+<ol>
+<li>提出了一种基于变量的状态表示方案，用于识别网络服务的状态并推断其状态模型，并将其用于指导模糊测试过程。</li>
+<li>提出了一种基于网络服务系统的网络事件循环的高效同步机制，实现网络服务模糊测试的更高吞吐量。</li>
+</ol>
+<h2 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h2><h3 id="早期的黑盒测试"><a href="#早期的黑盒测试" class="headerlink" title="早期的黑盒测试"></a>早期的黑盒测试</h3><p>早期的黑盒测试方法主要是使用基于生成的模糊测试工具。对于网络服务，这些方法依赖于对协议格式的事先了解，通过生成有效的测试用例进行模糊测试。</p>
+<h3 id="灰盒测试"><a href="#灰盒测试" class="headerlink" title="灰盒测试"></a>灰盒测试</h3><p>关于网络服务的灰盒模糊测试，一般会使用响应代码、状态模型或覆盖率等指标来表示网络服务的状态，并根据这些指标来引导模糊测试过程。灰盒模糊测试可以帮助发现网络服务中的安全漏洞、协议错误或异常行为，并对网络应用程序进行细粒度的状态分析和引导，以提高模糊测试的效率。</p>
+<h3 id="程序状态模型推断"><a href="#程序状态模型推断" class="headerlink" title="程序状态模型推断"></a>程序状态模型推断</h3><p>通过推断程序的状态模型，可以得知程序在不同状态下可能触发的行为和可能的状态转换。这有助于设计更有针对性和具有代表性的测试用例，从而增加发现漏洞的机会。例如，可以针对每个可能的状态和状态转换创建测试用例，以覆盖各种情况。此外，了解状态模型还有助于测试人员确定测试的边界条件和特殊情况，以提高测试用例的有效性。</p>
+<p>程序状态模型推断可以通过多种技术实现，如流量分析、动态污点分析、二进制标记结合网络跟踪等。这些技术可以从程序执行过程中收集信息，并根据这些信息推断出程序的状态模型。推断出的状态模型可以用于指导模糊测试的输入生成过程，从而提高测试的效果和效率。</p>
+<h2 id="网络服务的研究"><a href="#网络服务的研究" class="headerlink" title="网络服务的研究"></a>网络服务的研究</h2><h3 id="网络服务的实现"><a href="#网络服务的实现" class="headerlink" title="网络服务的实现"></a>网络服务的实现</h3><ul>
+<li><p>服务初始化阶段：在这个阶段，网络服务进行初始操作，如读取配置文件和根据启动参数初始化相关的数据结构。此外，服务会使用网络编程接口（如Glibc中的socket()函数）来创建套接字、绑定网络端口，并监听套接字等待远程客户端的连接请求。</p>
+</li>
+<li><p>服务处理阶段：在处理阶段，网络服务运行在一个事件循环中。服务会不断地处理来自客户端的请求并返回响应。当客户端请求到达时，服务会解析消息，调用相应的函数处理请求，并返回响应消息。网络服务只有在客户端主动退出或遇到异常时才会退出这个阶段。</p>
+</li>
+<li><p>服务清理阶段：当网络服务主动终止时，这个阶段负责进行程序清理工作，如释放资源，并最终退出停止提供服务。</p>
+</li>
+</ul>
+<p>由于网络服务需要为任意远程客户端提供长期的服务，它们通常以后台持久运行或作为守护进程运行。因此，网络服务程序大部分时间都在第二个阶段运行，即在网络事件循环中不断地处理远程客户端发送的请求消息。此外，需要注意的是，在网络服务的实现中，开发人员通常使用一些变量来表示服务器的状态，以支持运行有状态协议的功能。</p>
+<p><img src="https://www.z4a.net/images/2023/08/11/Snipaste_2023-08-11_15-42-56.png" alt="Snipaste_2023-08-11_15-42-56.png"></p>
+<p>如List 1所示（Service Processing状态），从第3行到第6行是一个网络事件循环，Bftpd在第3行接收请求消息并在第5行进行解析。Bftpd FTP协议服务会重复执行这些操作，直到远程客户端用户主动关闭网络套接字或服务因任何异常而结束。在Bftpd中，开发者使用命令结构来存储每种请求的类型名称、处理程序的函数指针和状态要求。在parsecmd()函数中，Bftpd首先尝试匹配传入请求消息的类型（第13行），并进行状态检查（第16行），然后只有在通过状态检查后才调用相应的处理程序（第18行），否则根据当前服务状态向客户端响应一个失败消息。</p>
+<h4 id="基于上述研究的发现（理解）"><a href="#基于上述研究的发现（理解）" class="headerlink" title="基于上述研究的发现（理解）"></a>基于上述研究的发现（理解）</h4><p>以Bftpd代码片段作为例子，说明<u>网络事件循环</u>的功能。在Bftpd的消息处理阶段，事件循环的入口可以表示Bftpd服务器已经处理完前一个FTP请求消息，并准备接收下一个FTP请求消息。因此，事件循环的入口可以作为一个同步点，主动通知模糊测试工具发送下一个请求消息，从而避免无用的等待时间。此外，这样的同步也可以告诉模糊测试工具进行状态收集，避免在执行后进行状态转换的分析。</p>
+<p>网络服务通常使用变量来表示运行时的服务状态。例如，当Bftpd接收到PASS请求消息（用于用户登录）时，会调用pass函数，将请求的密码字段作为函数参数（第18行），并根据当前服务状态执行不同的代码分支（从第37行到第44行）。当登录成功时，Bftpd会将服务状态更新为STATE CONNECTED。值得注意的是，网络服务使用一个枚举的全局变量state来表示服务的状态。它在网络事件循环中经常被读取（例如第21行）或更新（例如第42行）。此外，与响应代码相比，使用程序变量来表示服务状态也更加准确合理。在上述Bftpd代码片段中，不同服务状态下的失败响应消息的响应代码都是503（从第22行到第30行），这表明不能使用响应代码来区分网络服务的实际状态。</p>
+<p>总结：建议使用网络服务中的特定变量来准确表示服务状态，并利用网络事件循环作为指示器实现高效的I&#x2F;O同步。</p>
+<h2 id="方法论"><a href="#方法论" class="headerlink" title="方法论"></a>方法论</h2><p>NSFuzz主要由两个主要组件组成：静态分析和模糊测试循环。</p>
+<p>首先，NSFuzz将网络服务源代码作为输入，进行静态分析，以识别网络事件循环并提取状态变量。</p>
+<p>然后，它利用静态分析的结果进行编译时插桩，使目标服务具备基于信号的同步和基于变量的服务状态跟踪功能。</p>
+<p>在模糊测试循环中，NSFuzz将初始种子作为输入，并根据代码覆盖率和状态信息进行种子选择和消息变异，生成测试用例。</p>
+<p>在执行测试用例时，NSFuzz每次发送一个请求消息，并等待同步信号。</p>
+<p>一旦NSFuzz接收到信号，它收集程序状态并更新状态模型，执行基于状态的模糊测试。</p>
+<p>NSFuzz重复这个过程直到停止模糊测试循环，以找到程序崩溃问题。</p>
+<p><img src="https://www.z4a.net/images/2023/08/11/Snipaste_2023-08-11_16-30-03.png" alt="Snipaste_2023-08-11_16-30-03.png"></p>
+<h3 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h3><p>静态分析查找两个重要信息：网络事件循环和服务状态变量。</p>
+<p>网络事件循环负责在服务器处理阶段处理传入的请求消息。</p>
+<p>表示程序实现中关键状态变量的相关信息。</p>
+<ul>
+<li><p>静态分析可以提供网络事件循环的时机反馈，帮助fuzzer避免浪费时间。与基于响应代码的状态表示方案相比，基于变量的状态表示方案可以更真实地反映网络服务的状态，从而推断出更准确的状态模型。</p>
+</li>
+<li><p>此外，nsfuzz通过使用预执行的静态分析来提取状态变量，并在编译过程中对被测试的服务进行了工具化，实现了状态变量值与共享内存的实时映射，从而进一步提高了fuzzing的效率。</p>
+</li>
+</ul>
+<h4 id="网络事件循环标识"><a href="#网络事件循环标识" class="headerlink" title="网络事件循环标识"></a>网络事件循环标识</h4><p><u>识别事件循环的难点在于：将其与网络服务程序中的其他循环区分开来，因为在实现中存在太多不同的循环。</u></p>
+<p>例如，服务初始化阶段。许多服务可能使用文件I&#x2F;O循环来读取配置。此外，事件循环本身也可能包含嵌套循环，这也给静态分析器准确识别网络事件循环带来了困难。因此，nsfuzz跟踪服务处理阶段的网络I&#x2F;O操作，并通过回溯来区分外环以解决问题。</p>
+<p>具体解决方式:</p>
+<ol>
+<li>在网络服务完成初始化并进入服务处理阶段时，在与系统调用相关的输入上设置断点，如read、recv、recvmsg等。</li>
+<li>模糊测试工具建立与被测系统的套接字连接并发送探测消息。当命中断点时，被测系统保存函数调用栈的回溯。</li>
+<li>将回溯作为静态分析器的辅助输入，用于识别网络事件循环。</li>
+</ol>
+<h4 id="状态变量提取"><a href="#状态变量提取" class="headerlink" title="状态变量提取"></a>状态变量提取</h4><p>静态分析器根据网络服务实现的特性以及对服务程序中状态变量特征的分析，采用以下启发式规则来减少提取状态变量时的误报率：</p>
+<ol>
+<li>网络服务中与状态变量相关的操作通常在网络事件循环中执行。因此，静态分析器只在网络事件循环内进行分析，以减少分析的范围。</li>
+<li>网络服务中的状态变量通常在网络事件循环或消息处理程序中被读取（用于状态检查）或写入（用于状态更新）。因此，静态分析器只提取同时进行加载和存储操作的变量。</li>
+<li>网络服务中的状态变量通常是全局枚举变量或数据结构中的整数成员变量，并且它们只被分配常量值以表示特定状态。因此，静态分析器只保留在存储操作中分配了常量值的全局整数变量或用户定义的结构成员。</li>
+</ol>
+<h4 id="编译时插桩"><a href="#编译时插桩" class="headerlink" title="编译时插桩"></a>编译时插桩</h4><p>nsfuzz在编译时的两种插桩技术：</p>
+<ul>
+<li>网络事件循环插桩</li>
+<li>状态变量存储插桩</li>
+</ul>
+<p>网络事件循环插桩：通过在网络事件循环的入口处插入raise (SIGSTOP)语句，使得服务在处理完每个请求消息后，可以向模糊器发送信号反馈，表明准备好接收下一个请求消息。</p>
+<p>状态变量存储插桩：通过对每个状态变量的STORE操作进行插桩，将写入的变量值作为键更新SUT和模糊器之间共享的状态相关内存。为了区分记录代码覆盖率的共享内存，这里将记录状态信息的共享内存称为共享状态。具体的映射方法是使用每个状态变量的唯一字符串ID进行哈希运算，并将哈希值与要写入的新状态值进行异或运算，将异或结果作为索引更新共享状态。此外，NSFuzz还使用相同的方法根据先前的旧状态值计算索引以恢复共享状态。最后，NSFuzz生成了插桩的程序作为待模糊测试的服务。</p>
+<h3 id="Fuzzing-loop"><a href="#Fuzzing-loop" class="headerlink" title="Fuzzing loop"></a>Fuzzing loop</h3><p>与传统的覆盖率引导灰盒模糊器相比，NSFuzz引入了信号提升反馈，使得模糊器在测试用例执行过程中还需要配合仪表化信号反馈来实现快速的I&#x2F;O同步。此外，在状态变量的STORE操作处的插装使得NSFuzz还需要在适当的时间检查共享状态，并收集状态转换序列，以帮助推断状态模型。</p>
+<p><img src="https://www.z4a.net/images/2023/08/12/Snipaste_2023-08-12_16-07-38.png" alt="Snipaste_2023-08-12_16-07-38.png"></p>
+<h4 id="快速IO同步"><a href="#快速IO同步" class="headerlink" title="快速IO同步"></a>快速IO同步</h4><p>通过实现NET FORKSERVER与服务测试中信号反馈的合作来实现快速I&#x2F;O同步，从而避免了手动指定的时间等待间隔。在这种情况下，每次NSFuzz的模糊器发送请求消息时，它都通过管道等待NET FORKSERVER的反馈。作为模糊网络服务的父进程，NET FORKSERVER直接等待来自被测试服务的触发信号，根据信号类型确定目标是否完成了一轮I&#x2F;O交互或者仅仅是崩溃，然后将此类信息传递回模糊器。图2展示了NSFuzz框架中模糊器、NET FORKSERVER和服务测试之间的I&#x2F;O同步。</p>
+<h4 id="状态感知fuzz"><a href="#状态感知fuzz" class="headerlink" title="状态感知fuzz"></a>状态感知fuzz</h4><ol>
+<li><p>接收来自NET FORKSERVER的消息处理结果：当fuzzer通过通信管道接收到NET FORKSERVER的消息处理结果时，它会计算共享状态缓冲区的哈希值。</p>
+</li>
+<li><p>使用哈希值表示当前系统状态：这个哈希值可以用来表示系统当前的状态。原因在于，如果某个消息引起状态转换，它会更新某些状态变量的值，从而更新共享状态缓冲区。因此，当这个消息被处理后，fuzzer将会得到一个与处理之前不同的共享状态缓冲区的哈希值。换句话说，每当系统状态发生变化时，缓冲区的哈希值也会发生变化。因此，fuzzer可以使用缓冲区的哈希值来收集每个同步之后的状态转换序列，从而推断出状态模型。</p>
+</li>
+<li><p>使用哈希值进行状态表示：相比于STATEAFL，nsfuzz更充分地利用了基于变量的状态表示方案，通过使用共享状态哈希值来更充分地表示系统状态。这种方式可以比较高效地实现状态反馈。与STATEAFL不同的是，STATEAFL在每个消息处理期间连续地将所有变量值转储到分析队列中，并进行后执行分析以进行状态推断。</p>
+</li>
+<li><p>保留触发新服务状态或状态转换的测试用例：除了获取新的代码覆盖率外，nsfuzz还会将触发新服务状态或状态转换的测试用例保留作为有趣的种子，用于后续的fuzzing。</p>
+</li>
+<li><p>基于此，nsfuzz会执行类似于AFLNET的状态引导种子选择和消息变异操作，来进行状态引导的种子选择和消息变异。</p>
+</li>
+</ol>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>实验主要评估两个部分：</p>
+<ol>
+<li>NSFUZZ推断的状态模块的准确性：NSFuzz是否可以在模糊循环期间基于状态变量推断相对更准确的状态模型？</li>
+<li>NSFUZZ状态感知模糊化的有效性：NSFuzz是否可以比其他现有方法实现更高的模糊效率和概览结果？</li>
+</ol>
+<p>实验环境：ProFuzzBench作为有状态模糊测试的基准测试。</p>
+<p><img src="https://www.z4a.net/images/2023/08/12/Snipaste_2023-08-12_16-37-38.png" alt="Snipaste_2023-08-12_16-37-38.png"></p>
+<p>基线模糊器：AFLNET、STATEAFL、AFLNWE</p>
+<p>AFLNET使用消息响应码表示服务状态并推断状态模型，然后在模糊循环中基于该模型进行状态引导模糊。STATEAFL在网络I&#x2F;O循环期间收集已更改的变量。然后提取状态变量，通过实验后分析推导出状态模型。AFLNWE是AFLNET作者提出的另一种网络服务模糊器。它只是将文件I&#x2F;O接口由原来的AFL改为基于套接字的网络I&#x2F;O，实现了网络服务模糊化。</p>
+<h3 id="状态模块推断评估（评估1）"><a href="#状态模块推断评估（评估1）" class="headerlink" title="状态模块推断评估（评估1）"></a>状态模块推断评估（评估1）</h3><h4 id="静态分析阶段"><a href="#静态分析阶段" class="headerlink" title="静态分析阶段"></a>静态分析阶段</h4><p>首先执行静态分析以识别网络事件循环，并使用此类循环作为起点来提取状态变量。表II显示了NSFuzz对7个目标服务的静态分析结果。正如我们所看到的，NSFuzz可以成功地定位来自不同目标服务的网络事件循环，这涉及到多个网络协议，并且NSFuzz还可以通过静态分析提取状态变量。</p>
+<p><img src="https://www.z4a.net/images/2023/08/12/Snipaste_2023-08-12_16-38-40.png" alt="Snipaste_2023-08-12_16-38-40.png"></p>
+<p>此外，提取的状态变量的数量和分析时间通常与目标服务（LoC）的规模正相关，这是一致的直觉。应当注意，所提取的状态变量的名称有时可以直接指示其表示网络服务的状态的功能。</p>
+<p>例如，通过静态分析从Pure-FTPD中提取的状态变量之一是loggedin，这是一个全局变量，用于指示传入的客户端会话是否已完成FTP登录授权。此外，消息处理器可以根据客户端会话是否已经完成Pure-FTPD中的授权来针对同一请求消息执行不同的代码逻辑。然而，即使已经引入了多个启发式规则，静态分析结果仍然可能包含一些误报。</p>
+<h4 id="推断状态模块"><a href="#推断状态模块" class="headerlink" title="推断状态模块"></a>推断状态模块</h4><p>在进行网络服务的有状态模糊测试时，NSFuzz能够推断出服务的状态模型。通过对LightFTP进行12小时的模糊测试后，NSFuzz推断出了一个包含5个顶点和12条边的状态模型。在LightFTP中，静态分析提取了一个名为Access的状态变量，用于表示客户端会话的访问权限。经过手动分析源代码，发现Access有4个固定值，分别代表客户端用户的不同权限（未登录、只读、新建、完全权限），LightFTP会根据用户权限进行不同的消息处理过程。与其他模糊测试工具相比，NSFuzz推断的状态模型在准确性和解释性方面更优秀。同时，NSFuzz能够识别网络服务中更细粒度的状态，用户可以选择监视哪些状态变量来构建状态模型，实现不同粒度的状态模型推断。</p>
+<p><img src="https://www.z4a.net/images/2023/08/12/Snipaste_2023-08-12_20-01-55.png" alt="Snipaste_2023-08-12_20-01-55.png"></p>
+<p><img src="https://www.z4a.net/images/2023/08/12/Snipaste_2023-08-12_20-02-35.png" alt="Snipaste_2023-08-12_20-02-35.png"></p>
+<h3 id="Fuzz有效性评估（评估2）"><a href="#Fuzz有效性评估（评估2）" class="headerlink" title="Fuzz有效性评估（评估2）"></a>Fuzz有效性评估（评估2）</h3><ol>
+<li>模糊测试吞吐量：模糊测试吞吐量表示每秒执行的测试用例数量。显然，更高的模糊测试吞吐量意味着被测试程序执行了更多的测试用例，整体测试效率也更高。表V显示，NSFuzz的模糊测试吞吐量明显优于AFLNET和其他工具。在不同的目标服务中，NSFuzz的模糊测试吞吐量提高了1倍到50倍以上。由于STATEAFL需要在模糊测试过程中收集变量值以进行后执行分析以进行状态模型推断，STATEAFL引入的额外开销导致其模糊测试吞吐量较AFLNET下降。值得注意的是，AFLNWE是唯一一个没有状态感知的模糊测试工具，与AFLNET相比，它的模糊测试吞吐量也有所提高。这主要是因为AFLNWE只是AFL的一个支持网络I&#x2F;O的版本，只发送一次数据给被测服务，从而节省了多次网络交互中的等待延迟和状态相关的开销。然而，即使在这种情况下，AFLNWE的模糊测试吞吐量仍不如NSFuzz，这证明了基于轻量级插桩的NSFuzz的同步机制可以显著提高整体模糊测试效率。</li>
+</ol>
+<p><img src="https://www.z4a.net/images/2023/08/12/Snipaste_2023-08-12_20-03-13.png" alt="Snipaste_2023-08-12_20-03-13.png"></p>
+<ol start="2">
+<li>代码覆盖率：代码覆盖率一直是评估模糊测试工具的标准指标，它表示在整个模糊测试过程中执行了被测试服务中多少代码。通常，代码覆盖率越高，可能触发的程序漏洞就越多。表V显示，NSFuzz在几乎所有目标服务上都能达到更高的代码分支覆盖率。此外，虽然AFLNWE在这些模糊测试工具中具有相对较高的模糊测试吞吐量，但由于缺乏多个网络I&#x2F;O交互和状态指导，在模糊测试网络服务时无法实现良好的代码覆盖率。另外，STATEAFL在12小时的模糊测试中所覆盖的代码分支平均数量与AFLNET之间没有显著差异。图4显示了几种模糊测试工具在12小时模糊测试过程中探索的代码分支数量随时间的增长情况。从图中可以看出，NSFuzz不仅在大多数目标服务上能够覆盖更多的代码分支，而且能够比其他任何模糊测试工具更快地探索这些分支。</li>
+</ol>
+<p><img src="https://www.z4a.net/images/2023/08/12/Snipaste_2023-08-12_20-03-34.png" alt="Snipaste_2023-08-12_20-03-34.png"></p>
+<ol start="3">
+<li>崩溃触发：除了模糊测试吞吐量和代码覆盖率之外，崩溃触发直接反映了模糊测试工具的漏洞发现能力。表IV展示了不同模糊测试工具在模糊测试目标网络服务时触发第一个崩溃所花费的时间。如表所示，与其他竞争对手相比，NSFuzz在相同的目标上能触发崩溃，且触发第一个崩溃的平均时间明显较短。特别是在对TinyDTLS网络服务进行模糊测试的过程中，NSFuzz总能在不到1秒的时间内触发程序崩溃，这在一定程度上表明NSFuzz在模糊测试网络服务时能更快地触发潜在的漏洞。</li>
+</ol>
+<p><img src="https://www.z4a.net/images/2023/08/12/Snipaste_2023-08-12_20-03-49.png" alt="Snipaste_2023-08-12_20-03-49.png"></p>
+<h2 id="总结与展望"><a href="#总结与展望" class="headerlink" title="总结与展望"></a>总结与展望</h2><p>首先，NSFuzz的静态分析部分仅支持分析C语言目标，而不支持C++目标的分析。这主要是由于C++中的虚函数生成了间接调用，导致难以构建准确的调用图，从而影响了静态分析的结果。其次，一些网络应用程序使用事件驱动库（如libevent）来构建其服务程序。在这种情况下，我们定义的网络事件循环是在库中实现的，而不是在服务代码中，这给静态分析器找到在哪个位置插入raise函数以实现同步带来了挑战。受IJON和其他相关工作的启发，研究人员计划将注释机制引入NSFuzz，作为静态分析器的补充。他们将设计几个API来帮助用户在SUT中手动注释状态变量和同步点，这有望提高NSFuzz的适用性和可扩展性。</p>
+<p>此外，当前的初步评估缺乏充分的消融研究，即评估基于变量的状态表示方案对整体模糊测试效率的影响。因此，研究人员将在未来进行相应的消融实验，以研究准确状态表示在网络服务模糊测试中的影响。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="nwpuhkp">NWPUHKP</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://nwpuhkp.github.io/2023/08/12/nsfuzz-read/">http://nwpuhkp.github.io/2023/08/12/nsfuzz-read/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://nwpuhkp.github.io" target="_blank">The Blog of NWPUHKP</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8/">安全</a><a class="post-meta__tags" href="/tags/fuzz/">fuzz</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87/">论文</a></div><div class="post_share"><div class="social-share" data-image="https://www.z4a.net/images/2023/08/12/1322753.md.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现"><img class="cover" src="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">AFLNet 复现</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现"><img class="cover" src="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-01</div><div class="title">AFLNet 复现</div></div></a></div><div><a href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"><img class="cover" src="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-07-30</div><div class="title">AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</div></div></a></div><div><a href="/2023/04/03/RSA/" title="RSA密码总结"><img class="cover" src="https://www.z4a.net/images/2023/04/08/into.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">RSA密码总结</div></div></a></div><div><a href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img class="cover" src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">论文阅读-Live Trojan Attacks on Deep Neural Networks</div></div></a></div><div><a href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img class="cover" src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-14</div><div class="title">论文阅读-Fuzzing of Embedded Systems A Survey</div></div></a></div><div><a href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img class="cover" src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-05</div><div class="title">ROP初探之ret2text</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NWPUHKP</div><div class="author-info__description">且视他人之疑目如盏盏鬼火，大胆地去走你的夜路</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/nwpuhkp"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/nwpuhkp" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:kepuhuang@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://space.bilibili.com/57507739" target="_blank" title="Bilibili"><i class="fab fa-bilibili"></i></a><a class="social-icon" href="https://weibo.com/u/6035177688" target="_blank" title="Weibo"><i class="fab fa-weibo"></i></a><a class="social-icon" href="https://s1.ax1x.com/2023/04/02/ppf2g2T.jpg" target="_blank" title="Wechat"><i class="fab fa-weixin"></i></a><a class="social-icon" href="https://twitter.com/huangkepu" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#NSFuzz-Towards-Efficient-and-State-Aware-Network-Service-Fuzzing-%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB"><span class="toc-number">1.</span> <span class="toc-text">NSFuzz: Towards Efficient and State-Aware Network Service Fuzzing-论文阅读</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Introduction"><span class="toc-number">1.1.</span> <span class="toc-text">Introduction</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E4%BD%9C"><span class="toc-number">1.1.1.</span> <span class="toc-text">前作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#AFLNet"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">AFLNet</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#statefuzz"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">statefuzz</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%85%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.1.2.</span> <span class="toc-text">待解决的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nsfuzz%E7%9A%84%E8%B4%A1%E7%8C%AE"><span class="toc-number">1.1.3.</span> <span class="toc-text">nsfuzz的贡献</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="toc-number">1.2.</span> <span class="toc-text">相关工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A9%E6%9C%9F%E7%9A%84%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95"><span class="toc-number">1.2.1.</span> <span class="toc-text">早期的黑盒测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%81%B0%E7%9B%92%E6%B5%8B%E8%AF%95"><span class="toc-number">1.2.2.</span> <span class="toc-text">灰盒测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E7%8A%B6%E6%80%81%E6%A8%A1%E5%9E%8B%E6%8E%A8%E6%96%AD"><span class="toc-number">1.2.3.</span> <span class="toc-text">程序状态模型推断</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E6%9C%8D%E5%8A%A1%E7%9A%84%E7%A0%94%E7%A9%B6"><span class="toc-number">1.3.</span> <span class="toc-text">网络服务的研究</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E6%9C%8D%E5%8A%A1%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.3.1.</span> <span class="toc-text">网络服务的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E4%B8%8A%E8%BF%B0%E7%A0%94%E7%A9%B6%E7%9A%84%E5%8F%91%E7%8E%B0%EF%BC%88%E7%90%86%E8%A7%A3%EF%BC%89"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">基于上述研究的发现（理解）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E8%AE%BA"><span class="toc-number">1.4.</span> <span class="toc-text">方法论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90"><span class="toc-number">1.4.1.</span> <span class="toc-text">静态分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E6%A0%87%E8%AF%86"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">网络事件循环标识</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E5%8F%98%E9%87%8F%E6%8F%90%E5%8F%96"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">状态变量提取</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E6%97%B6%E6%8F%92%E6%A1%A9"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">编译时插桩</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Fuzzing-loop"><span class="toc-number">1.4.2.</span> <span class="toc-text">Fuzzing loop</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BF%AB%E9%80%9FIO%E5%90%8C%E6%AD%A5"><span class="toc-number">1.4.2.1.</span> <span class="toc-text">快速IO同步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E6%84%9F%E7%9F%A5fuzz"><span class="toc-number">1.4.2.2.</span> <span class="toc-text">状态感知fuzz</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C"><span class="toc-number">1.5.</span> <span class="toc-text">实验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E6%A8%A1%E5%9D%97%E6%8E%A8%E6%96%AD%E8%AF%84%E4%BC%B0%EF%BC%88%E8%AF%84%E4%BC%B01%EF%BC%89"><span class="toc-number">1.5.1.</span> <span class="toc-text">状态模块推断评估（评估1）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E9%98%B6%E6%AE%B5"><span class="toc-number">1.5.1.1.</span> <span class="toc-text">静态分析阶段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%A8%E6%96%AD%E7%8A%B6%E6%80%81%E6%A8%A1%E5%9D%97"><span class="toc-number">1.5.1.2.</span> <span class="toc-text">推断状态模块</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Fuzz%E6%9C%89%E6%95%88%E6%80%A7%E8%AF%84%E4%BC%B0%EF%BC%88%E8%AF%84%E4%BC%B02%EF%BC%89"><span class="toc-number">1.5.2.</span> <span class="toc-text">Fuzz有效性评估（评估2）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%B1%95%E6%9C%9B"><span class="toc-number">1.6.</span> <span class="toc-text">总结与展望</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/08/12/nsfuzz-read/" title="NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读"><img src="https://www.z4a.net/images/2023/08/12/1322753.md.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读"/></a><div class="content"><a class="title" href="/2023/08/12/nsfuzz-read/" title="NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读">NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读</a><time datetime="2023-08-12T12:51:19.000Z" title="发表于 2023-08-12 20:51:19">2023-08-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现"><img src="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AFLNet 复现"/></a><div class="content"><a class="title" href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现">AFLNet 复现</a><time datetime="2023-08-01T02:05:36.000Z" title="发表于 2023-08-01 10:05:36">2023-08-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"><img src="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"/></a><div class="content"><a class="title" href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记">AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</a><time datetime="2023-07-30T08:08:16.000Z" title="发表于 2023-07-30 16:08:16">2023-07-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="论文阅读-Fuzzing of Embedded Systems A Survey"/></a><div class="content"><a class="title" href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey">论文阅读-Fuzzing of Embedded Systems A Survey</a><time datetime="2023-06-14T08:54:36.000Z" title="发表于 2023-06-14 16:54:36">2023-06-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ROP初探之ret2shellcode"/></a><div class="content"><a class="title" href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode">ROP初探之ret2shellcode</a><time datetime="2023-05-06T12:20:36.000Z" title="发表于 2023-05-06 20:20:36">2023-05-06</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://www.z4a.net/images/2023/08/12/1322753.md.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2023 By NWPUHKP</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a>&nbsp;<a target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a>&nbsp;<a target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a>&nbsp;<a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a>&nbsp;<a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/"><span>备案号：陕ICP备2022011597号-1</span></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
