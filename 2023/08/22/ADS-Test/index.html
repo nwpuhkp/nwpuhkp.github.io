@@ -1,0 +1,261 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>A Survey on Automated Driving System Testing-Landscapes and Trends(二)[系统级ADS测试技术] | The Blog of NWPUHKP</title><meta name="author" content="NWPUHKP"><meta name="copyright" content="NWPUHKP"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="系统级ADS测试技术与模块级测试不同，系统级测试侧重于模块之间的协作而威胁整车安全的故障。 针对模块级的测试技术大部分的测试工作都是在模拟环境中完成的，由各种软件模拟器实现。 基于仿真的测试+混合现实测试（在测试循环中引入了真实硬件） 使用仿真器进行系统级测试测试方法+测试预期+测试充分性 测试方法基于搜索的测试+自适应压力测试+基于采样的方法+对抗攻击 基于搜索的测试（fuzz） Composi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Survey on Automated Driving System Testing-Landscapes and Trends(二)[系统级ADS测试技术]">
+<meta property="og:url" content="http://nwpuhkp.github.io/2023/08/22/ADS-Test/index.html">
+<meta property="og:site_name" content="The Blog of NWPUHKP">
+<meta property="og:description" content="系统级ADS测试技术与模块级测试不同，系统级测试侧重于模块之间的协作而威胁整车安全的故障。 针对模块级的测试技术大部分的测试工作都是在模拟环境中完成的，由各种软件模拟器实现。 基于仿真的测试+混合现实测试（在测试循环中引入了真实硬件） 使用仿真器进行系统级测试测试方法+测试预期+测试充分性 测试方法基于搜索的测试+自适应压力测试+基于采样的方法+对抗攻击 基于搜索的测试（fuzz） Composi">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.z4a.net/images/2023/08/22/R.png">
+<meta property="article:published_time" content="2023-08-22T08:49:36.000Z">
+<meta property="article:modified_time" content="2023-08-22T08:55:18.324Z">
+<meta property="article:author" content="NWPUHKP">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="车联网">
+<meta property="article:tag" content="ADS">
+<meta property="article:tag" content="Fuzz">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.z4a.net/images/2023/08/22/R.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://nwpuhkp.github.io/2023/08/22/ADS-Test/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: {"limitDay":500,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":80,"languages":{"author":"作者: NWPUHKP","link":"链接: ","source":"来源: The Blog of NWPUHKP","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'A Survey on Automated Driving System Testing-Landscapes and Trends(二)[系统级ADS测试技术]',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-08-22 16:55:18'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js/themes/blue/pace-theme-minimal.min.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js/pace.min.js"></script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">14</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://www.z4a.net/images/2023/08/22/R.md.png')"><nav id="nav"><span id="blog-info"><a href="/" title="The Blog of NWPUHKP"><span class="site-name">The Blog of NWPUHKP</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">A Survey on Automated Driving System Testing-Landscapes and Trends(二)[系统级ADS测试技术]</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-08-22T08:49:36.000Z" title="发表于 2023-08-22 16:49:36">2023-08-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-08-22T08:55:18.324Z" title="更新于 2023-08-22 16:55:18">2023-08-22</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%BD%A6%E8%81%94%E7%BD%91/">车联网</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%BD%A6%E8%81%94%E7%BD%91/%E8%87%AA%E5%8A%A8%E9%A9%BE%E9%A9%B6%E7%B3%BB%E7%BB%9F/">自动驾驶系统</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>18分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="A Survey on Automated Driving System Testing-Landscapes and Trends(二)[系统级ADS测试技术]"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="系统级ADS测试技术"><a href="#系统级ADS测试技术" class="headerlink" title="系统级ADS测试技术"></a>系统级ADS测试技术</h1><p>与模块级测试不同，系统级测试侧重于模块之间的协作而威胁整车安全的故障。</p>
+<p>针对模块级的测试技术大部分的测试工作都是在模拟环境中完成的，由各种软件模拟器实现。</p>
+<p>基于仿真的测试+混合现实测试（在测试循环中引入了真实硬件）</p>
+<h2 id="使用仿真器进行系统级测试"><a href="#使用仿真器进行系统级测试" class="headerlink" title="使用仿真器进行系统级测试"></a>使用仿真器进行系统级测试</h2><p>测试方法+测试预期+测试充分性</p>
+<h3 id="测试方法"><a href="#测试方法" class="headerlink" title="测试方法"></a>测试方法</h3><p>基于搜索的测试+自适应压力测试+基于采样的方法+对抗攻击</p>
+<h4 id="基于搜索的测试（fuzz）"><a href="#基于搜索的测试（fuzz）" class="headerlink" title="基于搜索的测试（fuzz）"></a>基于搜索的测试（fuzz）</h4><ol>
+<li><a target="_blank" rel="noopener" href="https://link.springer.com/article/10.1007/s10817-018-09509-5">Compositional falsification of cyber-physical systems with machine learning components</a>提出了一个组合的基于搜索的测试框架，并将其应用于具有机器学习组件（即主要是感知）的ADS的测试。他们的工作的基本思想是协同使用感知输入空间和整个系统输入空间：一个空间上的约束可以减少另一个空间上的搜索代价。这样，他们提高了寻找反例的效率。</li>
+<li><a target="_blank" rel="noopener" href="https://dl.acm.org/doi/abs/10.1145/3238147.3238192">Testing autonomous cars for feature interaction failures using many-objective search</a>提出了一种多目标搜索算法，用于检测由特征交互引起的错误。特征交互描述了不同ADS功能之间的相互作用，例如，AEB命令可能被ACC命令覆盖，因为这两个功能都控制着制动执行器。在实践中，基于搜索的测试也被证明对工业级ADS有效.</li>
+<li><a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/9251068/">AV-FUZZER: Finding safety violations in autonomous driving systems</a>用于APOLLO测试，该框架在发现危险场景方面的有效性。</li>
+</ol>
+<p>有一系列的工作研究测试输入和系统行为之间的关系：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://dl.acm.org/doi/abs/10.1145/3368089.3409730">Model-based exploration of the frontier of behaviours for deep learning system testing</a>提出了一种行为边界的概念，它表示了系统开始出现异常行为的输入的边界。</li>
+<li><a target="_blank" rel="noopener" href="https://dl.acm.org/doi/abs/10.1145/3460319.3464811">Deephyperion: exploring the feature space of deep learning-based systems through illumination search</a>首先提供了一个可解释的特征映射，用来解释测试输入和系统行为之间的相关性，并利用Illumination Search来探索特征空间。</li>
+<li><a target="_blank" rel="noopener" href="https://dl.acm.org/doi/abs/10.1145/3544792">Efficient and effective feature space exploration for testing deep learning systems</a>改进了可解释的特征映射,用于寻找那些有助于特征映射探索的测试输入。</li>
+</ol>
+<p>车道保持系统是自动驾驶系统测试的一个重要目标。当应用基于搜索的测试时，不同的道路表示方式会影响方法的有效性。</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/9724804/">Analysis of road representations in search-based testing of autonomous driving systems</a>比较了六种用于测试车道保持系统的道路表示方式，并发现曲率和方向是影响这些系统行为的重要因素。</li>
+<li><a target="_blank" rel="noopener" href="https://dl.acm.org/doi/abs/10.1145/3293882.3330566">Automatically testing self-driving cars with search-based procedural content generation</a>提出了一种名为ASFAULT的新方法，用于生成虚拟道路来测试车道保持系统。在BeamNG.AI和DeepDriving上的实验表明，该方法可以生成有效的测试道路，使车辆偏离正确的车道。</li>
+<li><a target="_blank" rel="noopener" href="https://dl.acm.org/doi/abs/10.1145/3526072.3527532">FreneticV at the SBST 2022 tool competition</a></li>
+</ol>
+<p>还有一些其他的工作旨在通过设计更好的搜索算法来提高搜索效率。</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://dl.acm.org/doi/abs/10.1145/3180155.3180160">Testing vision-based control systems using learnable evolutionary algorithms</a>和<a target="_blank" rel="noopener" href="https://dl.acm.org/doi/abs/10.1145/3238147.3238192">Testing autonomous cars for feature interaction failures using many-objective search</a>将多目标搜索与决策树分类相结合，用于自动驾驶系统的测试生成。在他们的框架中，分类器检查场景是否是一个关键场景，并加速搜索过程。</li>
+<li><a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/9743067/">Eagle strategy with local search for scenario based validation of autonomous vehicles</a>应用基于Eagle策略的RRT来估计关键场景边界。</li>
+<li><a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/9233535/">Rapid generation of challenging simulation scenarios for autonomous vehicles based on adversarial test</a>提出了一种量子遗传算法，允许较低的种群大小。</li>
+<li><a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/9678883/">Targeting requirements violations of autonomous driving systems by dynamic evolutionary search</a>研究了测试用例优先级技术，并使用多目标搜索算法来寻找更有可能发生的违规情况。测试用例优先级技术也被用于加速自动驾驶系统的回归测试并取得了显著的结果。</li>
+</ol>
+<p>基于搜索的测试通常基于系统仿真；然而，即使使用软件仿真器，自动驾驶系统的仿真仍然可能是昂贵和缓慢的。还有另一系列工作训练替代模型作为测试加速的替代品。</p>
+<h4 id="自适应压力测试"><a href="#自适应压力测试" class="headerlink" title="自适应压力测试"></a>自适应压力测试</h4><p>压力测试已经在工业的各个领域被广泛采用，它通过提供超出被测系统能力的测试用例来进行测试。自适应压力测试，顾名思义，是以一种自适应的方式进行压力测试；也就是说，它对测试用例进行优先级排序，并根据不同的测试资源进行分配。因此，指定优先级分配策略是自适应压力测试的关键。</p>
+<h4 id="基于采样的方法"><a href="#基于采样的方法" class="headerlink" title="基于采样的方法"></a>基于采样的方法</h4><p>自动驾驶系统测试中的一个用例是通过从自然场景分布中抽样来生成场景，以使生成的场景更加真实。</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/8569631/">A novel, modular validation framework for collision avoidance of automated vehicles at road junctions</a>提出了一个基于抽样的框架，用于验证道路交叉口的自动驾驶系统。具体来说，他们首先根据真实世界的事故数据，对交叉口场景及其代表性的变化进行聚类，然后用拉丁超立方抽样方法对这些相关参数进行抽样，并用它们来组成具体的仿真测试场景。 抽样也被用来帮助识别故障特征。</li>
+<li><a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/9294490/">Interpretable safety validation for autonomous vehicles</a>将信号时序逻辑(STL)与抽样方法相结合，用于生成测试中的干扰轨迹。由于STL的特点，即对时间上的逻辑关系的描述，这些轨迹是可解释的，也更容易调试。</li>
+</ol>
+<h4 id="对抗攻击"><a href="#对抗攻击" class="headerlink" title="对抗攻击"></a>对抗攻击</h4><p>用于测试感知模块。<br>这些工作攻击了感知模块，但是它们评估了攻击对整个系统的影响。</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.usenix.org/conference/usenixsecurity21/presentation/sato"> Dirty road can attack: Security of deep learning based automated lane centering under {Physical-World} attack</a>生成了攻击补丁，作为脏路的伪装，误导受害者自动驾驶系统的横向控制功能偏离车道。</li>
+<li><a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/8639042/">Experimental resilience assessment of an open-source driving agent</a>根据系统级安全风险分析，对相机捕获的图像生成扰动，以评估OpenPilot在真实环境条件下的可靠性。</li>
+<li><a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/9799362/">badvertisement: Attacking advanced driver-assistance systems using print advertisements</a>利用印刷广告进行攻击，例如，他们在其他车辆的后面嵌入一个对抗性的交通标志，并误导系统做出错误的行为。</li>
+</ol>
+<h3 id="测试预期"><a href="#测试预期" class="headerlink" title="测试预期"></a>测试预期</h3><p>自动驾驶系统的系统级测试的预期通常由安全指标来定义，例如碰撞时间，它衡量了被测自动驾驶系统距离危险情况有多远。这些指标可以通过监测仿真器中的系统行为直接计算，或者用形式化规范来表示，例如STL，它可以自动监测系统行为并计算指标值。此外，一些工作中也使用了变形关系来定义自动驾驶系统的预期。</p>
+<h4 id="安全指标"><a href="#安全指标" class="headerlink" title="安全指标"></a>安全指标</h4><p>在系统级测试中，一个合适的安全指标，或者称为关键性指标，可以用来发现更多的系统违规。</p>
+<p>这些安全指标可以分为<strong>时间指标</strong>和<strong>非时间指标</strong>。</p>
+<ol>
+<li><p>时间指标描述了对运动物体的时间要求，最流行的是碰撞时间(TTC)及其扩展，例如最坏碰撞时间(WTTC)，它们衡量了自车在场景中与碰撞的接近程度。Weng等人提出了一种模型预测瞬时安全指标(MPrISM)，它考虑了运动车辆之间的交互。另一些指标包括车头时距(THW)和反应时间(TTR)。前者计算了自车到达前车位置所需的时间，后者估计了所需反应的剩余时间，例如刹车动作。</p>
+</li>
+<li><p>非时间指标涉及不同的方面，例如距离、减速和转向。一种距离指标叫做停止距离(SD)，它计算了一辆车以最大舒适减速度停止所需的距离。另一种距离指标叫做横向位置(LP)，它定义了车辆中心与行驶车道中心之间的距离。减速指标，例如避免碰撞的减速率(DRAC)，考虑了紧急情况下的减速率。转向指标，例如转向角反转率(SARR)，关注了车辆在行驶过程中的转向角。 有一些工作<a target="_blank" rel="noopener" href="https://link.springer.com/chapter/10.1007/978-3-030-26601-1_5">Fitness functions for testing automated and autonomous driving systems</a>和<a target="_blank" rel="noopener" href="https://ieeexplore.ieee.org/abstract/document/9564591/">Fitness function templates for testing automated and autonomous driving systems in intersection scenarios</a>提出了以一种优雅的方式组织和利用这些安全指标。此外，李等人提出了设计涉及更多因素的指标，例如场景、任务和自动驾驶系统功能之间的关系。</p>
+</li>
+</ol>
+<p><img src="https://www.z4a.net/images/2023/08/22/Snipaste_2023-08-22_15-54-50.png" alt="Snipaste_2023-08-22_15-54-50.png"></p>
+<h4 id="形式化规范"><a href="#形式化规范" class="headerlink" title="形式化规范"></a>形式化规范</h4><p>形式化规范使用时序逻辑语言来表达系统在运行过程中应该满足的性质；然后通过基于规范的监测，系统行为的满足度可以自动决定。在自动驾驶系统的系统级测试中，STL，它可以表达实时连续变量上的性质，是规范语言的合适选择。有一些工作采用STL作为规范语言，其中STL监视器被综合出来，用来判断自动驾驶系统的行为是否满足期望的安全性质。也有研究者利用形式化规范来表示驾驶规则和自动驾驶系统的行为，以检查它们之间的一致性。</p>
+<h4 id="变形测试"><a href="#变形测试" class="headerlink" title="变形测试"></a>变形测试</h4><p>在系统级测试中，有研究者利用变形关系来区分真正的故障和误报。变形关系规定了自动驾驶系统在稍微不同的场景中的行为应该是相似的；否则，在这样的场景中发生的碰撞被认为是可避免的，因此是一个真正的故障。</p>
+<h3 id="测试充分性"><a href="#测试充分性" class="headerlink" title="测试充分性"></a>测试充分性</h3><p>在系统级测试中，测试的充分性体现在ADS测试场景的多样性上。</p>
+<h4 id="场景覆盖"><a href="#场景覆盖" class="headerlink" title="场景覆盖"></a>场景覆盖</h4><p>直观地来说，如果所有不同类型的场景都被覆盖了，那么测试就是充分的。唐等人[252]根据地图的拓扑结构对场景进行分类。Kerber等人[253]根据场景的时空特征定义了一种距离度量，用于实现场景聚类。此外，仿真数据的时间、空间和因果信息可以进一步抽象为情境，用于覆盖更多的测试场景[254, 255]。</p>
+<h4 id="组合覆盖"><a href="#组合覆盖" class="headerlink" title="组合覆盖"></a>组合覆盖</h4><p>与直接基于场景特征定义的上述覆盖标准不同，组合覆盖考虑了不同参数组合的覆盖，这些参数用于识别不同的场景。Tuncali等人[247, 248]提出了使用覆盖数组来生成自动驾驶系统测试中的场景。覆盖数组是软件测试中的一种特定机制，它保证了参数的t-路组合覆盖的满足。关于t-路组合覆盖的更多细节，请参见5.2.3节。郭等人[256]提出了场景复杂度的定义，并应用组合测试技术来生成更复杂的测试场景。舒等人[257]在变道场景中采用了三路组合测试方法，确保了生成的关键场景的高覆盖率。李等人[258]利用本体概念，即实体及其关系的表达，来描述自动驾驶系统的驾驶环境。然后将构建的本体与组合测试技术相结合，用于生成具有覆盖保证的具体场景。另一项工作[259]提出了一种基于t-路组合测试的场景生成框架，称为ComOpT，并发现了阿波罗系统的众多故障。此外，组合测试也被用于参考文献[260]中解决自动驾驶系统的回归测试问题。</p>
+<h3 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h3><p><img src="https://www.z4a.net/images/2023/08/22/T9.png" alt="T9.png"></p>
+<p>基于搜索的测试（FUZZ）是测试整个自动驾驶系统最广泛使用的技术，有不同的关注点，例如研究测试输入和系统行为之间的关系[190–192]，测试车道保持系统[26, 189, 193, 209]和测试用例优先级[199–201]。</p>
+<p>虽然基于仿真的测试旨在解决现实世界测试的高成本问题，但它可能会反复模拟相同类型的场景，这也是一个耗时的过程。</p>
+<p>因此，自适应压力测试[211, 212, 214, 216]和基于抽样的技术[217–219, 221, 223, 224, 228–230]被用来加速测试过程。</p>
+<p>与感知和端到端模块的情况一样，对抗攻击[235–238]也被用于系统级测试，其目的是检测感知的漏洞，这些漏洞会影响整个系统的安全性。</p>
+<p>在这些测试技术中，自适应压力测试还没有被广泛研究，但它在未来的自动驾驶系统测试中具有很高的潜力，因为它在工业的各个领域都很有效[269]。 </p>
+<p>系统级测试通常依赖于安全指标，例如时间和非时间指标（如表8所示）和变形关系[250]，作为在测试过程中测量安全违规发生的预言。为了确保系统级测试的充分性，有两条工作线，即场景覆盖[252–254]和组合测试[247, 248, 256–260]，它们提出了用于表征测试场景多样性的指标。 总体而言，在系统级测试中存在比模块级测试更多的工作。</p>
+<p>总结：有大量的研究利用了不同的技术，例如，基于搜索的测试、自适应压力测试和基于采样的技术，用于在系统级测试ADS。此外，已经针对测试过程中的不同用途提出了许多度量，例如，它们被用来测量违反安全规定的发生，并且它们被用来表征测试场景的多样性。</p>
+<h2 id="混合现实测试"><a href="#混合现实测试" class="headerlink" title="混合现实测试"></a>混合现实测试</h2><p>由于自动驾驶系统的现实世界测试的昂贵性，之前的大多数方法都是在软件仿真器中测试自动驾驶系统的。尽管现代仿真器可以很强大和高保真，但基于仿真的测试并不足以揭示自动驾驶系统的所有问题，因为仿真器和现实世界之间存在差距。作为一种折中，混合现实测试将基于仿真的测试与现实世界测试相结合。在本节中，介绍了几种特殊的测试方案，它们用物理组件替换了测试循环中的某些部分。具体来说，这些方案包括Hardware-in-the-Loop(HiL)、Vehicle-in-the-Loop(ViL)和Scenario-in-the-Loop(SciL)。</p>
+<p><img src="https://www.z4a.net/images/2023/08/22/Snipaste_2023-08-22_16-15-25.png" alt="Snipaste_2023-08-22_16-15-25.png"></p>
+<h3 id="Hardware-in-the-Loop"><a href="#Hardware-in-the-Loop" class="headerlink" title="Hardware-in-the-Loop"></a>Hardware-in-the-Loop</h3><p>Hardware-in-the-Loop测试通常将真实的ECU硬件引入到测试循环中，如图4中的绿色框所示。有一系列的工作[270–273]采用了这种测试方法。陈等人[270, 271]提出了一个硬件在环测试平台，它可以利用OpenStreetMap[274]来模拟大规模场景中的多智能体交互。Brogle等人[272]基于Carla和ROS构建了他们的硬件在环平台，它在车辆动力学和传感器数据输出方面实现了高保真度。高等人[273]设计了另一个用于AEB测试的硬件在环平台，并发现AEB功能在硬件在环测试中的性能接近于真实道路测试。</p>
+<h3 id="Vehicle-in-the-Loop"><a href="#Vehicle-in-the-Loop" class="headerlink" title="Vehicle-in-the-Loop"></a>Vehicle-in-the-Loop</h3><p>Vehicle-in-the-Loop测试的工作原理是将一个同步的虚拟场景集成到一辆真实的车辆中，如图4中的灰色框所示。我们收集的以下工作[275–279]都是基于这个思想的。陈等人[275]提出了一个车辆在环测试平台，它可以根据相应的高清地图重建场景。为了模拟更真实的场景，这些工作[276–278]将流行的交通仿真器，如SUMO[280]和VISSIM[281]，集成到车辆在环测试循环中。Stocco等人[279]利用DonkeyCar平台[282]构建了一个1:16比例的汽车，它由端到端驾驶模型控制。他们在一个封闭的跑道环境中测试这些驾驶模型，并研究了仿真和现实世界之间故障的可转移性。</p>
+<h3 id="Scenario-in-the-Loop"><a href="#Scenario-in-the-Loop" class="headerlink" title="Scenario-in-the-Loop"></a>Scenario-in-the-Loop</h3><p>Scenario-in-the-Loop测试通过将更多的真实组件，如行人假人，集成到循环中，来缩小仿真器和现实世界之间的差距，如图4中的蓝色框所示。Szalay等人[283]首先提出了场景在环测试的概念，并在后续的工作[285]中基于SUMO和Unity[284]开发了一个场景在环测试平台。Horvath等人[286]通过比较这种方法与车辆在环测试的实现过程来研究场景在环测试。作者发现，这两种测试方法有相同的基础，但场景在环测试仍处于早期阶段。</p>
+<h2 id="仿真测试和实际测试的对比"><a href="#仿真测试和实际测试的对比" class="headerlink" title="仿真测试和实际测试的对比"></a>仿真测试和实际测试的对比</h2><h3 id="测试用例的真实性"><a href="#测试用例的真实性" class="headerlink" title="测试用例的真实性"></a>测试用例的真实性</h3><p>在基于仿真的测试中，<strong>有一个问题是由测试算法生成的导致系统故障的虚拟场景可能永远不会发生在现实世界中</strong>。例如，仿真器创建了一系列的交通参与者，但其中只有一部分是真实可能发生的。 有一系列的工作旨在弥合这个差距，从而生成自然的场景用于自动驾驶系统测试。Nalic等人[288]提出了一个使用两种仿真工具，CarMaker（用于车辆动力学）和VISSIM（用于交通仿真）的协同仿真框架；他们的框架可以根据从真实数据中衍生出来的校准过的交通模型生成场景。在他们后来的工作[289]中，应用了一种压力测试方法，它已经在6.1.1节中介绍过，在协同仿真环境下增加了检测到的关键场景的数量。Klischat等人[290]利用OpenStreetMap提取真实世界的道路交叉口，并与SUMO结合生成逼真的交通场景。温等人[291]关注在自车附近的特定区域触发事件，并使用基于卷积神经网络(CNN)的选择器来选择那些能够实现更真实结果的场景代理。 以下工作[292–296]专注于从公开的事故报告中重建场景。Mostadi等人[295]利用一种距离度量，即曼哈顿距离，来将虚拟场景与真实场景对齐。计算机视觉算法，即目标检测和跟踪，在参考文献[292, 296]中被用来从事故视频中提取车辆的轨迹。Gambi等人[189, 293, 294]利用自然语言处理技术提取相关信息，然后计算抽象轨迹来重建事故。实验结果表明，该方法能够准确地重建公开报告中的事故，并且生成的测试用例能够暴露开源自动驾驶系统，即DeepDriving[207]，的错误。 还有一系列工作[297–300]专注于缩小训练过程中的现实差距。通过包含增强数据、小型汽车和真实世界轨道等组件，他们可以生成更真实的情况来训练自动驾驶感知模型或强化学习算法。</p>
+<h3 id="仿真器的真实性"><a href="#仿真器的真实性" class="headerlink" title="仿真器的真实性"></a>仿真器的真实性</h3><p>Antkiewicz等人[301]进行了一项关于不同仿真水平的测试评估的比较研究。在他们的工作中，作者研究了基于仿真的测试、混合现实测试和现实世界测试在两个场景中的应用，即跟车和替代行人过马路。他们提出了各种指标，例如真实性、成本、敏捷性、可扩展性和可控性，并基于这些指标比较了不同的测试方案。作为他们的结论，他们定量地展示了测试方案之间的性能差异：虽然现实世界测试在真实性方面更好，但它比基于仿真的测试更昂贵，也更缺乏敏捷性、可扩展性和可控性；混合现实测试的性能处于它们之间。Borg等人[302]研究了在不同仿真器中测试自动驾驶系统，他们利用基于搜索的测试技术在两个仿真器中生成场景，即PreScan[303]和Pro-SiVIC[304]。他们发现了测试输出的显著差异，例如，他们检测到了不同的安全违规。因此，他们建议在未来涉及多个仿真器来进行更稳健的基于仿真的测试。 虽然基于仿真的测试不能达到与现实世界测试相同的真实性，但基于仿真的测试的结果在多大程度上可以对现实世界测试有益？这个问题在参考文献[305]中进行了研究，作者在其中进行了基于仿真的测试，以识别关键场景并将它们映射到现实世界环境中。他们的关键见解表明，62.5%由仿真器检测到的不安全场景转化为真实碰撞，93.3%与仿真器一起的安全场景在现实世界中也是安全的。另一个问题是，仿真器生成的数据集是否可以替代基于DNN的自动驾驶系统测试的现实世界数据集，这已经在参考文献[306, 307]中进行了研究。此外，他们还比较了离线测试（例如模块级测试）和在线测试（例如系统级测试）在其优缺点方面。基于DNN的自动驾驶系统上的实验表明，在两个数据集上平均预测误差差异小于0.1，这意味着仿真器生成的数据集可以作为现实世界数据集的替代品。在线测试比离线测试更适合基于DNN的自动驾驶系统测试，因为在线测试可以检测到更多错误，即那些随时间累积而产生的错误，而离线测试则不能。Reway等人[308]通过在三种不同环境下（即一个真实试验场和两个仿真软件）对一个目标检测算法进行测试，评估了仿真与现实之间的差距，并考虑了四种天气条件。通过考虑每个平台上诸如精度和召回率等指标来定量计算差距。他们的一个实验结果是，在夜间和雨天条件下，真实和仿真域之间的差距大于白天条件下的差距。</p>
+<h2 id="回答RQ2"><a href="#回答RQ2" class="headerlink" title="回答RQ2"></a>回答RQ2</h2><p>90多篇专门针对自动驾驶系统的系统级测试的论文中，那些模块级测试技术，如基于搜索的测试、抽样和对抗攻击，也被广泛用于寻找由系统级不同模块之间的协作引起的故障。此外，还提出或利用了更多的指标，用于促进测试过程。</p>
+<p>另一个发现是，有30多篇论文专注于缩小仿真和现实世界环境之间的差距，例如，通过将真实组件引入到测试循环中，或者通过比较基于仿真的测试和现实世界测试。</p>
+<p>与模块级测试类似，自动驾驶系统的系统级测试仍然存在一些开放的挑战。例如，由于测试过程中的系统执行既昂贵又耗时，因此需要在未来探索如何加速测试过程。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="nwpuhkp">NWPUHKP</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://nwpuhkp.github.io/2023/08/22/ADS-Test/">http://nwpuhkp.github.io/2023/08/22/ADS-Test/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://nwpuhkp.github.io" target="_blank">The Blog of NWPUHKP</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8/">安全</a><a class="post-meta__tags" href="/tags/%E8%BD%A6%E8%81%94%E7%BD%91/">车联网</a><a class="post-meta__tags" href="/tags/ADS/">ADS</a><a class="post-meta__tags" href="/tags/Fuzz/">Fuzz</a></div><div class="post_share"><div class="social-share" data-image="https://www.z4a.net/images/2023/08/22/R.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-full"><a href="/2023/08/14/gdb/" title="gdb常用调试命令"><img class="cover" src="https://www.z4a.net/images/2023/08/14/valorant-viper-game-art-hd-wallpaper-x-preview-61.md.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">gdb常用调试命令</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/04/03/RSA/" title="RSA密码总结"><img class="cover" src="https://www.z4a.net/images/2023/04/08/into.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">RSA密码总结</div></div></a></div><div><a href="/2023/04/03/LiveAttackDRL/" title="论文阅读-Live Trojan Attacks on Deep Neural Networks"><img class="cover" src="https://www.z4a.net/images/2023/04/06/cover_2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-03</div><div class="title">论文阅读-Live Trojan Attacks on Deep Neural Networks</div></div></a></div><div><a href="/2023/06/14/note_fuzzing_of_embedded_systems_a_survey/" title="论文阅读-Fuzzing of Embedded Systems A Survey"><img class="cover" src="https://www.z4a.net/images/2023/06/14/20220601001511_ae873.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-14</div><div class="title">论文阅读-Fuzzing of Embedded Systems A Survey</div></div></a></div><div><a href="/2023/05/05/rop_ret2text/" title="ROP初探之ret2text"><img class="cover" src="https://www.z4a.net/images/2023/05/05/ret2text_top.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-05</div><div class="title">ROP初探之ret2text</div></div></a></div><div><a href="/2023/05/06/rop_ret2shellcode/" title="ROP初探之ret2shellcode"><img class="cover" src="https://www.z4a.net/images/2023/05/06/ropshellcodetop.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-06</div><div class="title">ROP初探之ret2shellcode</div></div></a></div><div><a href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现"><img class="cover" src="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-08-01</div><div class="title">AFLNet 复现</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://www.z4a.net/images/2023/04/06/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NWPUHKP</div><div class="author-info__description">且视他人之疑目如盏盏鬼火，大胆地去走你的夜路</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">14</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/nwpuhkp"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/nwpuhkp" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:kepuhuang@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://space.bilibili.com/57507739" target="_blank" title="Bilibili"><i class="fab fa-bilibili"></i></a><a class="social-icon" href="https://weibo.com/u/6035177688" target="_blank" title="Weibo"><i class="fab fa-weibo"></i></a><a class="social-icon" href="https://s1.ax1x.com/2023/04/02/ppf2g2T.jpg" target="_blank" title="Wechat"><i class="fab fa-weixin"></i></a><a class="social-icon" href="https://twitter.com/huangkepu" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E7%BA%A7ADS%E6%B5%8B%E8%AF%95%E6%8A%80%E6%9C%AF"><span class="toc-number">1.</span> <span class="toc-text">系统级ADS测试技术</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E4%BB%BF%E7%9C%9F%E5%99%A8%E8%BF%9B%E8%A1%8C%E7%B3%BB%E7%BB%9F%E7%BA%A7%E6%B5%8B%E8%AF%95"><span class="toc-number">1.1.</span> <span class="toc-text">使用仿真器进行系统级测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.1.</span> <span class="toc-text">测试方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E6%90%9C%E7%B4%A2%E7%9A%84%E6%B5%8B%E8%AF%95%EF%BC%88fuzz%EF%BC%89"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">基于搜索的测试（fuzz）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E9%80%82%E5%BA%94%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">自适应压力测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E9%87%87%E6%A0%B7%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">基于采样的方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E6%8A%97%E6%94%BB%E5%87%BB"><span class="toc-number">1.1.1.4.</span> <span class="toc-text">对抗攻击</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E9%A2%84%E6%9C%9F"><span class="toc-number">1.1.2.</span> <span class="toc-text">测试预期</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E6%8C%87%E6%A0%87"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">安全指标</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BD%A2%E5%BC%8F%E5%8C%96%E8%A7%84%E8%8C%83"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">形式化规范</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%98%E5%BD%A2%E6%B5%8B%E8%AF%95"><span class="toc-number">1.1.2.3.</span> <span class="toc-text">变形测试</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E5%85%85%E5%88%86%E6%80%A7"><span class="toc-number">1.1.3.</span> <span class="toc-text">测试充分性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF%E8%A6%86%E7%9B%96"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">场景覆盖</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%84%E5%90%88%E8%A6%86%E7%9B%96"><span class="toc-number">1.1.3.2.</span> <span class="toc-text">组合覆盖</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A8%E8%AE%BA"><span class="toc-number">1.1.4.</span> <span class="toc-text">讨论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%B7%E5%90%88%E7%8E%B0%E5%AE%9E%E6%B5%8B%E8%AF%95"><span class="toc-number">1.2.</span> <span class="toc-text">混合现实测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Hardware-in-the-Loop"><span class="toc-number">1.2.1.</span> <span class="toc-text">Hardware-in-the-Loop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Vehicle-in-the-Loop"><span class="toc-number">1.2.2.</span> <span class="toc-text">Vehicle-in-the-Loop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Scenario-in-the-Loop"><span class="toc-number">1.2.3.</span> <span class="toc-text">Scenario-in-the-Loop</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%BF%E7%9C%9F%E6%B5%8B%E8%AF%95%E5%92%8C%E5%AE%9E%E9%99%85%E6%B5%8B%E8%AF%95%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="toc-number">1.3.</span> <span class="toc-text">仿真测试和实际测试的对比</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E7%9A%84%E7%9C%9F%E5%AE%9E%E6%80%A7"><span class="toc-number">1.3.1.</span> <span class="toc-text">测试用例的真实性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BF%E7%9C%9F%E5%99%A8%E7%9A%84%E7%9C%9F%E5%AE%9E%E6%80%A7"><span class="toc-number">1.3.2.</span> <span class="toc-text">仿真器的真实性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9E%E7%AD%94RQ2"><span class="toc-number">1.4.</span> <span class="toc-text">回答RQ2</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/08/22/ADS-Test/" title="A Survey on Automated Driving System Testing-Landscapes and Trends(二)[系统级ADS测试技术]"><img src="https://www.z4a.net/images/2023/08/22/R.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="A Survey on Automated Driving System Testing-Landscapes and Trends(二)[系统级ADS测试技术]"/></a><div class="content"><a class="title" href="/2023/08/22/ADS-Test/" title="A Survey on Automated Driving System Testing-Landscapes and Trends(二)[系统级ADS测试技术]">A Survey on Automated Driving System Testing-Landscapes and Trends(二)[系统级ADS测试技术]</a><time datetime="2023-08-22T08:49:36.000Z" title="发表于 2023-08-22 16:49:36">2023-08-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/14/gdb/" title="gdb常用调试命令"><img src="https://www.z4a.net/images/2023/08/14/valorant-viper-game-art-hd-wallpaper-x-preview-61.md.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="gdb常用调试命令"/></a><div class="content"><a class="title" href="/2023/08/14/gdb/" title="gdb常用调试命令">gdb常用调试命令</a><time datetime="2023-08-14T08:02:45.000Z" title="发表于 2023-08-14 16:02:45">2023-08-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/12/nsfuzz-read/" title="NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读"><img src="https://www.z4a.net/images/2023/08/12/1322753.md.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读"/></a><div class="content"><a class="title" href="/2023/08/12/nsfuzz-read/" title="NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读">NSFuzz-Towards Efficient and State-Aware Network Service Fuzzing-论文阅读</a><time datetime="2023-08-12T12:51:19.000Z" title="发表于 2023-08-12 20:51:19">2023-08-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现"><img src="https://www.z4a.net/images/2023/08/08/29142123_0d2be5b3de6f18a141fe03195f.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AFLNet 复现"/></a><div class="content"><a class="title" href="/2023/08/01/AFLNET-Reappear/" title="AFLNet 复现">AFLNet 复现</a><time datetime="2023-08-01T02:05:36.000Z" title="发表于 2023-08-01 10:05:36">2023-08-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"><img src="https://www.z4a.net/images/2023/08/08/small_2022041290528457.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记"/></a><div class="content"><a class="title" href="/2023/07/30/AFLNet-note/" title="AFLNET：一种用于网络协议的灰盒模糊器-论文笔记">AFLNET：一种用于网络协议的灰盒模糊器-论文笔记</a><time datetime="2023-07-30T08:08:16.000Z" title="发表于 2023-07-30 16:08:16">2023-07-30</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://www.z4a.net/images/2023/08/22/R.md.png')"><div id="footer-wrap"><div class="copyright">&copy;2023 By NWPUHKP</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a>&nbsp;<a target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a>&nbsp;<a target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a>&nbsp;<a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a>&nbsp;<a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/"><span>备案号：陕ICP备2022011597号-1</span></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
